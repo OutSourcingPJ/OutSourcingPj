@@ -16,11 +16,11 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     Optional<Store> checkStore(@Param("storeId") Long storeId);
 
     // 모든 가게 반환 리스트 반환
-    @Query("SELECT s FROM Store s WHERE s.storeStatus = true ORDER BY s.advertise DESC, s.storeId DESC")
+    @Query("SELECT s FROM Store s WHERE s.storeStatus = false ORDER BY s.advertise DESC, s.storeId DESC")
     List<Store> findAllActiveStores();
 
     // 특정 이름을 가진 활성화된 가게 리스트 반환
-    @Query("SELECT s FROM Store s WHERE s.storeStatus = true AND s.name LIKE %:name% ORDER BY s.advertise DESC, s.storeId DESC")
+    @Query("SELECT s FROM Store s WHERE s.storeStatus = false AND s.name LIKE %:name% ORDER BY s.advertise DESC, s.storeId DESC")
     List<Store> findStoresByName(@Param("name") String name);
 
 }

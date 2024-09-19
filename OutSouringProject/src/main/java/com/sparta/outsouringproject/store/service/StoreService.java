@@ -27,7 +27,7 @@ public class StoreService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다!"));
 
-        // 회원파트 생성되면 적용
+        // 회원파트 생성되면 적용 + delte값 설정되어있을테니 findById에서 JPQL로 수정
 //        if(user.getRole() != RoleType.OWNER) {
 //            throw new IllegalArgumentException("해당 회원은 가게 등록 권한이 없습니다!");
 //        }
@@ -77,7 +77,7 @@ public class StoreService {
         Store store = storeRepository.checkStore(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
         // 권한 체크 코드
-//        if(!store.getUser().getUserId().equals(userId)) {
+//        if(!store.getUser().getUserId().equals(ArgumentResolver에서 반환된 userId값)) {
 //            throw new IllegalArgumentException("수정 권한이 없습니다!");
 //        }
 
@@ -93,6 +93,13 @@ public class StoreService {
         if(requestDto.getCloseTime() != null) {
             store.changeCloseTime(requestDto.getCloseTime());
         }
+        // 광고 설정 advertise값을 string으로 true, flase 입력받음, 입력 값에 따라서 세팅 변경
+        if(requestDto.getAdvertise().equals("true")) {
+            store.setAdvertise(true);
+        }
+        if(requestDto.getAdvertise().equals("false")) {
+            store.setAdvertise(false);
+        }
         Store newStore = storeRepository.save(store);
         return new StoreResponseDto(newStore);
     }
@@ -103,8 +110,8 @@ public class StoreService {
         Store store = storeRepository.checkStore(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
         // 권한 체크 코드
-//        if(!store.getUser().getUserId().equals(userId)) {
-//            throw new IllegalArgumentException("수정 권한이 없습니다!");
+//        if(!store.getUser().getUserId().equals(ArgumentResolver에서 반환된 userId값)) {
+//            throw new IllegalArgumentException("폐업 권한이 없습니다!");
 //        }
 
         store.setStoreStatus(true);
