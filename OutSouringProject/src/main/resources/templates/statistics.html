@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Statistics Page</title>
+
+  <!-- Chart.js for graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- 기본 CSS 스타일 -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    .statistics h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .statistics span {
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    /* 차트 영역 조정 */
+    .charts-container {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    canvas {
+      max-width: 300px;
+      max-height: 300px;
+      margin: 20px;
+    }
+
+
+  </style>
+</head>
+<body>
+
+<!-- 메인 콘텐츠 -->
+<div class="content">
+  <h1>Admin Statistics</h1>
+
+  <div class="card">
+    <div class="statistics">
+      <h2>Daily Sales Amount</h2>
+      <span id="dailySalesAmount"></span> 원
+    </div>
+    <div class="statistics">
+      <h2>Daily Order Count</h2>
+      <span id="dailyOrderCount"></span> 건
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="statistics">
+      <h2>Monthly Sales Amount</h2>
+      <span id="monthlySalesAmount"></span> 원
+    </div>
+    <div class="statistics">
+      <h2>Monthly Order Count</h2>
+      <span id="monthlyOrderCount"></span> 건
+    </div>
+  </div>
+
+  <!-- 차트 영역 -->
+  <div class="charts-container">
+    <!-- 매출액 차트 -->
+    <canvas id="salesChart" width="300" height="300"></canvas>
+
+    <!-- 주문 건수 차트 -->
+    <canvas id="orderCountChart" width="300" height="300"></canvas>
+  </div>
+
+  <!-- 월간 차트 영역 -->
+  <div class="charts-container">
+    <!-- 월간 매출액 차트 -->
+    <canvas id="monthlySalesChart" width="300" height="300"></canvas>
+
+    <!-- 월간 주문 건수 차트 -->
+    <canvas id="monthlyOrderCountChart" width="300" height="300"></canvas>
+  </div>
+
+</div>
+
+<script>
+  // 숫자 포맷팅 (쉼표 추가)
+  function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  // Thymeleaf에서 전달된 값들
+  const dailySalesAmount = [[${dailySalesAmount}]];
+  const dailyOrderCount = [[${dailyOrderCount}]];
+  const monthlySalesAmount = [[${monthlySalesAmount}]];
+  const monthlyOrderCount = [[${monthlyOrderCount}]];
+
+  // 포맷팅 후 텍스트로 표시
+  document.getElementById('dailySalesAmount').textContent = formatNumber(dailySalesAmount);
+  document.getElementById('dailyOrderCount').textContent = dailyOrderCount;
+  document.getElementById('monthlySalesAmount').textContent = formatNumber(monthlySalesAmount);
+  document.getElementById('monthlyOrderCount').textContent = monthlyOrderCount;
+
+  // Daily Sales Chart
+  var salesCtx = document.getElementById('salesChart').getContext('2d');
+  var salesChart = new Chart(salesCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Sales Amount'],
+      datasets: [{
+        label: 'Daily Sales',
+        data: [parseFloat(dailySalesAmount)],
+        backgroundColor: ['rgba(54, 162, 235, 0.2)'],
+        borderColor: ['rgba(54, 162, 235, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+
+  // Daily Order Count Chart
+  var orderCountCtx = document.getElementById('orderCountChart').getContext('2d');
+  var orderCountChart = new Chart(orderCountCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Order Count'],
+      datasets: [{
+        label: 'Daily Orders',
+        data: [parseFloat(dailyOrderCount)],
+        backgroundColor: ['rgba(255, 159, 64, 0.2)'],
+        borderColor: ['rgba(255, 159, 64, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+
+  // Monthly Sales Chart
+  var monthlySalesCtx = document.getElementById('monthlySalesChart').getContext('2d');
+  var monthlySalesChart = new Chart(monthlySalesCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Sales Amount'],
+      datasets: [{
+        label: 'Monthly Sales',
+        data: [parseFloat(monthlySalesAmount)],
+        backgroundColor: ['rgba(54, 162, 235, 0.2)'],
+        borderColor: ['rgba(54, 162, 235, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+
+  // Monthly Order Count Chart
+  var monthlyOrderCountCtx = document.getElementById('monthlyOrderCountChart').getContext('2d');
+  var monthlyOrderCountChart = new Chart(monthlyOrderCountCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Order Count'],
+      datasets: [{
+        label: 'Monthly Orders',
+        data: [parseFloat(monthlyOrderCount)],
+        backgroundColor: ['rgba(255, 159, 64, 0.2)'],
+        borderColor: ['rgba(255, 159, 64, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+</script>
+
+</body>
+</html>
