@@ -1,5 +1,8 @@
 package com.sparta.outsouringproject.statistics.service;
 
+import com.sparta.outsouringproject.statistics.dto.StatisticsInfo;
+import java.time.LocalDate;
+
 public interface StatisticsService {
 
     /**
@@ -51,4 +54,7 @@ public interface StatisticsService {
     Long getMonthlyOrderCount(Long storeId);
 
     String getStoreName(Long storeId);
+
+    StatisticsInfo getStatistics(Long storeId, LocalDate startDate, LocalDate endDate);
+    StatisticsInfo getStatistics(LocalDate startDate, LocalDate endDate);
 }
