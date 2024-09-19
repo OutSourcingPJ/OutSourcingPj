@@ -1,5 +1,8 @@
 package com.sparta.outsouringproject.menu.entity;
 
+
+//import com.sparta.outsouringproject.cart.entity.CartItem;
+import com.sparta.outsouringproject.store.entity.Store;
 import com.sparta.outsouringproject.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,7 +16,7 @@ public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    private Long menuId;
+    private Long menu_id;
 
 
       @ManyToOne(fetch = FetchType.LAZY)
@@ -31,9 +34,9 @@ public class Menu {
     private Boolean deleted = false;
 
 
-    public Menu(String menuName, Long menuId, Long menuPrice) {
+    public Menu(String menuName, Long menu_id, Long menuPrice) {
         this.menuName = menuName;
-        this.menuId = menuId;
+        this.menu_id = menu_id;
         this.menuPrice = menuPrice;
     }
 
@@ -44,8 +47,6 @@ public class Menu {
     public void updateUserName(String menuName) {
         this.menuName = menuName;
     }
-
-
 
 
 }
