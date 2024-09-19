@@ -1,5 +1,7 @@
 package com.sparta.outsouringproject.menu.entity;
 
+import com.sparta.outsouringproject.cart.entity.CartItem;
+import com.sparta.outsouringproject.store.entity.Store;
 import com.sparta.outsouringproject.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,4 +20,7 @@ public class Menu {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id",nullable = false)
     private Store store;
+
+    @OneToOne(mappedBy = "menu")
+    private CartItem cartItem;
 }

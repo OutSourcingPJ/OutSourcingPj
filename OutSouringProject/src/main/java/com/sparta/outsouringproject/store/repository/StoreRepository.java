@@ -22,4 +22,5 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     // 특정 이름을 가진 활성화된 가게 리스트 반환
     @Query("SELECT s FROM Store s WHERE s.storeStatus = true AND s.name LIKE %:name% ORDER BY s.advertise DESC, s.storeId DESC")
     List<Store> findStoresByName(@Param("name") String name);
+
 }
