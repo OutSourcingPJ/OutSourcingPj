@@ -6,6 +6,9 @@ import com.sparta.outsouringproject.review.service.ReviewService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +30,10 @@ public class ReviewController {
     }
 
     @GetMapping("/menu_id")
-    ResponseEntity<List<ReviewResponseDto>> getReviews(@PathVariable Long menuId) {
-        return ResponseEntity.ok(reviewService.getReview(menuId));
+    ResponseEntity<List<ReviewResponseDto>> getReviews(@PathVariable Long menuId,
+                                                       @RequestParam(defaultValue = "1")int page,
+                                                       @RequestParam(defaultValue = "10")int size) {
+        Pageable pageable = PageRequest.of(page -1, size, Sort.by(Sort.Direction.DESC));
+        return ResponseEntity.ok(reviewService.getReview(menuId, pageable));
     }
 }
