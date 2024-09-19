@@ -33,6 +33,24 @@ public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long
     @Query("SELECT o FROM OrderHistory  o WHERE o.soldDate >= :startOfDate AND o.soldDate < :endOfDate AND o.storeId = :storeId")
     List<OrderHistory> findAllDailyOrderHistoryByStoreId(@Param("storeId") Long storeId, @Param("startOfDate") LocalDateTime startOfDate, @Param("endOfDate") LocalDateTime endOfDate);
 
+    // 범위 매출액
+    @Query("SELECT SUM(o.soldTotalPrice) FROM OrderHistory o WHERE o.soldDate >= :startOfDay AND o.soldDate < :endOfDay")
+    Long findSalesAmount(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+
+    // 범위 주문 건수
+    @Query("SELECT COUNT(DISTINCT o.orderId) FROM OrderHistory o WHERE o.soldDate >= :startOfDay AND o.soldDate < :endOfDay")
+    Long findOrderCount(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+
+
+    // 특정 가게 범위 매출액
+    @Query("SELECT SUM(o.soldTotalPrice) FROM OrderHistory o WHERE o.soldDate >= :startOfDay AND o.soldDate < :endOfDay AND o.storeId = :storeId")
+    Long findSalesAmountByStoreId(@Param("storeId") Long storeId, @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+
+    // 특정 가게 범위 주문 건수
+    @Query("SELECT COUNT(DISTINCT o.orderId) FROM OrderHistory o WHERE o.soldDate >= :startOfDay AND o.soldDate < :endOfDay AND o.storeId = :storeId")
+    Long findOrderCountByStoreId(@Param("storeId") Long storeId, @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+
+
     // 특정 가게 일일 매출액
     @Query("SELECT SUM(o.soldTotalPrice) FROM OrderHistory o WHERE o.soldDate >= :startOfDay AND o.soldDate < :endOfDay AND o.storeId = :storeId")
     Long findDailySalesAmountByStoreId(@Param("storeId") Long storeId, @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
