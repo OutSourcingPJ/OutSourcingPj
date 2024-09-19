@@ -1,15 +1,25 @@
 package com.sparta.outsouringproject.order.dto;
 
-import lombok.Builder;
+import com.sparta.outsouringproject.order.entity.OrderItem;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItemInfo {
 
-    private final Long orderItemId;
-    private final Long menuId;
-    private final Long quantity;
-    private final Long price;
-    private final Long totalPrice;
+    private Long orderItemId;
+    private Long menuId;
+    private Long quantity;
+    private Long price;
+    private Long totalPrice;
+
+    public OrderItemInfo(OrderItem orderItem){
+        this.orderItemId = orderItem.getId();
+        this.menuId = orderItem.getMenu().getMenu_id();
+        this.quantity = orderItem.getQuantity();
+        this.price = orderItem.getPrice();
+        this.totalPrice = orderItem.getTotalPrice();
+    }
 }
