@@ -31,6 +31,5 @@ public class Cart extends Timestamped {
 
     public void relatedUser(User user) {
         this.user = user;
-        user.setCart(this);
     }
 }

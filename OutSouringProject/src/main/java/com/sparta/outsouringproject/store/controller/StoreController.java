@@ -1,5 +1,7 @@
 package com.sparta.outsouringproject.store.controller;
 
+import com.sparta.outsouringproject.menu.dto.MenuResponseDto;
+import com.sparta.outsouringproject.menu.service.MenuService;
 import com.sparta.outsouringproject.store.dto.*;
 import com.sparta.outsouringproject.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StoreController {
     private final StoreService storeService;
+    private MenuService menuService;
 
     /**
      * 가게 등록
@@ -78,4 +81,12 @@ public class StoreController {
         response.put("message", "성공적으로 삭제가 되었습니다.");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    // 메뉴 리스트 조회 (가게 ID로 메뉴 리스트 가져오기)
+    @GetMapping("/{storeId}/menus")
+    public ResponseEntity<List<MenuResponseDto>> getMenuListByStore(@PathVariable("storeId") Long storeId) {
+        List<MenuResponseDto> menuList = menuService.getMenuList(storeId);  // 메뉴 서비스 호출
+        return new ResponseEntity<>(menuList, HttpStatus.OK);
+    }
+
 }
