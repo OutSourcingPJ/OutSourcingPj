@@ -17,7 +17,7 @@ public class OrderItemInfo {
 
     public OrderItemInfo(OrderItem orderItem){
         this.orderItemId = orderItem.getId();
-        this.menuId = orderItem.getMenu().getMenu_id();
+        this.menuId = orderItem.getMenu().getMenuId();
         this.quantity = orderItem.getQuantity();
         this.price = orderItem.getPrice();
         this.totalPrice = orderItem.getTotalPrice();

@@ -2,6 +2,7 @@ package com.sparta.outsouringproject.order.controller;
 
 import com.sparta.outsouringproject.order.dto.OrderCreateRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderCreateResponseDto;
+import com.sparta.outsouringproject.order.dto.OrderStatusChangeRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderStatusResponseDto;
 import com.sparta.outsouringproject.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -31,31 +32,14 @@ public class OrderController {
     }
 
     /**
-     * 주문 요청 수락
+     * 주문 상태 변경
      */
-    @PatchMapping("stores/{storeId}/orders/{orderId}/accept")
-    public  ResponseEntity<Void> acceptOrder(@PathVariable("storeId") Long storeId, @PathVariable("orderId") Long orderId){
-        orderService.acceptOrder(null, storeId, orderId);
+    @PatchMapping("/stores/{storeId}/orders/{orderId}/status")
+    public  ResponseEntity<Void> acceptOrder(@PathVariable("storeId") Long storeId, @PathVariable("orderId") Long orderId, OrderStatusChangeRequestDto requestDto){
+        orderService.changeOrderStatus(null, storeId, orderId, requestDto);
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * 주문 배달 출발
-     */
-    @PatchMapping("stores/{storeId}/orders/{orderId}/delivery")
-    public  ResponseEntity<Void> startDelivery(@PathVariable("storeId") Long storeId, @PathVariable("orderId") Long orderId) {
-        orderService.startDelivery(null, storeId, orderId);
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * 배달완료
-     */
-    @PatchMapping("stores/{storeId}/orders/{orderId}/complete")
-    public ResponseEntity<Void> completeDelivery(@PathVariable("storeId") Long storeId, @PathVariable("orderId") Long orderId) {
-        orderService.completeOrder(null, storeId, orderId);
-        return ResponseEntity.ok().build();
-    }
 
     /**
      * 현재 주문 상태

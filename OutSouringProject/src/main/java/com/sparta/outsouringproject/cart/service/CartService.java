@@ -2,6 +2,7 @@ package com.sparta.outsouringproject.cart.service;
 
 import com.sparta.outsouringproject.cart.dto.AddMenuRequestDto;
 import com.sparta.outsouringproject.cart.dto.CartItemInfo;
+import com.sparta.outsouringproject.cart.dto.CartItemListInfo;
 import com.sparta.outsouringproject.cart.dto.CartItemUpdateRequestDto;
 import com.sparta.outsouringproject.user.entity.User;
 import java.util.List;
@@ -40,7 +41,7 @@ public interface CartService {
      * @param user
      * @return
      */
-    List<CartItemInfo> getCartItems(User user);
+    CartItemListInfo getCartItems(User user);
 
     /**
      * 장바구니에 해당 아이디의 물품 삭제
