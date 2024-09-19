@@ -24,15 +24,15 @@ public class MenuService {
 
     @Transactional
     public MenuResponseDto saveMenu(String token, MenuRequestDto requestDto) throws AuthException {
-        // 1. 토큰으로 사장님 확인
+        // 사장님 확인
         Store store = validateOwner(token, requestDto.getStoreId());
 
-        // 2. 메뉴 이름 중복 확인
+        // 메뉴 이름 중복 확인
         if (menuRepository.findByName(requestDto.getMenuName()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 메뉴 이름입니다: " + requestDto.getMenuName());
         }
 
-        // 3. 새로운 메뉴 생성
+        // 새로운 메뉴 생성
         Menu menu = new Menu(requestDto.getMenuName(), null, Long.parseLong(requestDto.getMenuPrice()));
         menuRepository.save(menu);
 
@@ -50,5 +50,21 @@ public class MenuService {
         }
         return store;
     }
+
+    // 메뉴 삭제 메서드
+    @Transactional
+    public void deleteMenu(String token, Long menuId) throws AuthException {
+        // 메뉴가 존재하는지 확인
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
+
+        // 해당 메뉴가 속한 가게의 사장님인지 확인
+        Store store = validateOwner(token, menu.getStore());
+
+        //메뉴 삭제 상태로 변경
+        menu.deleteMenu();
+        log.info("메뉴 '{}' 가 삭제되었습니다.", menu.getMenuName());
+    }
+
 }
 
