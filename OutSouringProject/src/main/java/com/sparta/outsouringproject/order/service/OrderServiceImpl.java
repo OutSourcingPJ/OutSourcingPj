@@ -8,9 +8,12 @@ import com.sparta.outsouringproject.menu.repository.MenuRepository;
 import com.sparta.outsouringproject.order.dto.OrderCreateRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderCreateResponseDto;
 import com.sparta.outsouringproject.order.dto.OrderItemInfo;
+import com.sparta.outsouringproject.order.dto.OrderStatusChangeRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderStatusResponseDto;
 import com.sparta.outsouringproject.order.entity.Order;
+import com.sparta.outsouringproject.statistics.entity.OrderHistory;
 import com.sparta.outsouringproject.order.entity.OrderItem;
+import com.sparta.outsouringproject.statistics.repository.OrderHistoryRepository;
 import com.sparta.outsouringproject.order.repository.OrderItemRepository;
 import com.sparta.outsouringproject.order.repository.OrderRepository;
 import com.sparta.outsouringproject.store.entity.Store;
@@ -34,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
     private final CartItemRepository cartItemRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
 
     @Override
     public OrderCreateResponseDto createOrder(User user, OrderCreateRequestDto orderRequest) {
@@ -97,7 +101,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void acceptOrder(User user, Long storeId, Long orderId) {
+    public void changeOrderStatus(User user, Long storeId, Long orderId,
+        OrderStatusChangeRequestDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("Store not found"));
 
         if(store.getUser() == null || !store.getUser().equals(user)){
@@ -106,51 +111,42 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = orderRepository.findByIdOrElseThrow(orderId);
 
-        // 중복 요청 체크
-        if (order.getStatus() == OrderStatus.ACCEPTED) {
-            // todo: 이미 수락한 요청입니다.
-        }
+        order.updateStatus(requestDto.getOrderStatus());
 
         // 주문 수락되면 장바구니 목록 삭제
-        cartItemRepository.deleteAllByCart_User(user);
+        if(order.getStatus().equals(OrderStatus.ACCEPTED)){
+            cartItemRepository.deleteAllByCart_User(user);
+        }
 
-        order.updateStatus(OrderStatus.ACCEPTED);
+        // 주문이 완료되면 기록 저장
+        if(order.getStatus().equals(OrderStatus.COMPLETED)) {
+            List<OrderItem> items = orderItemRepository.findAllByOrder(order);
+            List<OrderHistory> historyList = new ArrayList<>();
+
+            for(OrderItem item : items){
+                OrderHistory history = OrderHistory.builder()
+                    .soldDate(LocalDateTime.now())
+                    .orderId(item.getOrder().getId())
+                    .storeId(item.getOrder().getStore().getStoreId())
+                    .userId(item.getOrder().getUser().getId())
+                    .menuId(item.getMenu().getMenuId())
+                    .menuName(item.getMenu().getMenuName())
+                    .quantity(item.getQuantity())
+                    .soldPrice(item.getPrice())
+                    .soldTotalPrice(item.getTotalPrice())
+                    .build();
+
+                historyList.add(history);
+            }
+
+            if(!historyList.isEmpty()){
+                orderHistoryRepository.saveAll(historyList);
+            }
+        }
+
     }
 
-    @Override
-    public void startDelivery(User user, Long storeId, Long orderId) {
-        Store store = storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("Store not found"));
 
-        if(store.getUser() == null || !store.getUser().equals(user)){
-            throw new IllegalArgumentException("가게의 사장 정보가 없거나, 가게의 사장님이 아닙니다.");
-        }
-
-        Order order = orderRepository.findByIdOrElseThrow(orderId);
-
-        // 중복 요청 체크
-        if (order.getStatus() == OrderStatus.DELIEVERY) {
-            // todo: 이미 배달 중 입니다.
-        }
-
-        order.updateStatus(OrderStatus.DELIEVERY);
-    }
-
-    @Override
-    public void completeOrder(User user, Long storeId, Long orderId) {
-        Store store = storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("Store not found"));
-
-        if(store.getUser() == null || !store.getUser().equals(user)){
-            throw new IllegalArgumentException("가게의 사장 정보가 없거나, 가게의 사장님이 아닙니다.");
-        }
-
-        Order order = orderRepository.findByIdOrElseThrow(orderId);
-
-        if (order.getStatus() == OrderStatus.COMPLETED) {
-            // todo: 이미 완료된 주문입니다.
-        }
-
-        order.updateStatus(OrderStatus.COMPLETED);
-    }
 
     @Override
     public OrderStatusResponseDto getCurrentOrderStatus(User user, Long orderId) {

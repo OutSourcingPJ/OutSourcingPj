@@ -2,6 +2,7 @@ package com.sparta.outsouringproject.cart.controller;
 
 import com.sparta.outsouringproject.cart.dto.AddMenuRequestDto;
 import com.sparta.outsouringproject.cart.dto.CartItemInfo;
+import com.sparta.outsouringproject.cart.dto.CartItemListInfo;
 import com.sparta.outsouringproject.cart.dto.CartItemUpdateRequestDto;
 import com.sparta.outsouringproject.cart.service.CartService;
 import java.util.List;
@@ -58,7 +59,7 @@ public class CartController {
      * @return
      */
     @GetMapping("/items")
-    public ResponseEntity<List<CartItemInfo>> getAllItems() {
+    public ResponseEntity<CartItemListInfo> getAllItems() {
         return ResponseEntity.ok().body(cartService.getCartItems(null));
     }
 
