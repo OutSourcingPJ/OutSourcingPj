@@ -1,5 +1,8 @@
 package com.sparta.outsouringproject.menu.entity;
 
+
+import com.sparta.outsouringproject.cart.entity.CartItem;
+import com.sparta.outsouringproject.store.entity.Store;
 import com.sparta.outsouringproject.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -44,8 +47,6 @@ public class Menu {
     public void updateUserName(String menuName) {
         this.menuName = menuName;
     }
-
-
 
 
 }
