@@ -23,7 +23,7 @@ public class ReviewService {
 
     public ReviewResponseDto createReview(Long menuId, ReviewRequestDto reviewRequestDto, String email) {
         Menu menu = menuRepository.findById(menuId).orElseThrow(()-> new IllegalArgumentException("메뉴를 찾을 수 없습니다."));
-        User user = userRepository.findByEmail(email).orElseThow(()-> new IllegalArgumentException("작성 권한이 없습니다."));
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("작성 권한이 없습니다."));
         Review savedReview = new Review(menu, user, reviewRequestDto);
         reviewRepository.save(savedReview);
         return new ReviewResponseDto(savedReview);
@@ -31,5 +31,6 @@ public class ReviewService {
 
     public List<ReviewResponseDto> getReview(Long menuId) {
 
+        return List.of();
     }
 }

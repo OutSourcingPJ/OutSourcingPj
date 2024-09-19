@@ -13,6 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -37,6 +40,21 @@ public class MenuService {
         menuRepository.save(menu);
 
         return new MenuResponseDto(menu.getMenuName(), menu.getMenuPrice());
+    }
+
+    // 메뉴 리스트 조회 메서드
+    public List<MenuResponseDto> getMenuList(Long storeId) {
+        // 1. 가게가 존재하는지 확인
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게입니다."));
+
+        // 2. 해당 가게의 삭제되지 않은 메뉴 조회
+        List<Menu> menus = menuRepository.findByStoreAndDeletedFalse(store);
+
+        // 3. 조회된 메뉴들을 MenuResponseDto로 변환하여 반환
+        return menus.stream()
+                .map(menu -> new MenuResponseDto(menu.getMenuName(), menu.getMenuPrice()))
+                .collect(Collectors.toList());
     }
 
     private Store validateOwner(String token, Store storeId) throws AuthException {
