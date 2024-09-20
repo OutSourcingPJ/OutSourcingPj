@@ -8,6 +8,7 @@ import com.sparta.outsouringproject.user.config.PasswordEncoder;
 import com.sparta.outsouringproject.user.entity.Role;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +70,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String login(String email, String password) {
+    public String login(String email, String password, HttpServletResponse response) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
@@ -77,7 +78,7 @@ public class UserService {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
         String token = jwtUtil.createToken(user.getEmail());
-
+        jwtUtil.addJwtToCookie(token, response);
         return token;
     }
 
