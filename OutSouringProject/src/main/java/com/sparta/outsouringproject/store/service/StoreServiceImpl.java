@@ -113,17 +113,19 @@ public class StoreServiceImpl implements StoreService{
             store.changeCloseTime(requestDto.getCloseTime());
         }
         // 광고 설정 advertise값을 string으로 true, flase 입력받음, 입력 값에 따라서 세팅 변경
-        if(requestDto.getAdvertise().equals("true")) {
-            if(store.getAdvertise().equals(true)) {
-                throw new IllegalArgumentException("해당 가게는 이미 광고로 지정되었습니다.");
+        if(requestDto.getAdvertise() != null) {
+            if(requestDto.getAdvertise().equals("true")) {
+                if(store.getAdvertise().equals(true)) {
+                    throw new IllegalArgumentException("해당 가게는 이미 광고로 지정되었습니다.");
+                }
+                store.setAdvertise(true);
             }
-            store.setAdvertise(true);
-        }
-        if(requestDto.getAdvertise().equals("false")) {
-            if(store.getAdvertise().equals(false)) {
-                throw new IllegalArgumentException("해당 가게는 광고로 지정되지 않았습니다.");
+            if(requestDto.getAdvertise().equals("false")) {
+                if(store.getAdvertise().equals(false)) {
+                    throw new IllegalArgumentException("해당 가게는 광고로 지정되지 않았습니다.");
+                }
+                store.setAdvertise(false);
             }
-            store.setAdvertise(false);
         }
         Store newStore = storeRepository.save(store);
         log.info("::: 가게 수정 완료 :::");
