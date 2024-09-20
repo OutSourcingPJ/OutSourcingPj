@@ -44,7 +44,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReview(menuId, pageable));
     }
 
-    @PutMapping("{/reviewId}")
+    @PutMapping("/{reviewId}")
     ResponseEntity<ReviewResponseDto> updateReview(@PathVariable Long reviewId,
                                                    @Valid @ModelAttribute ReviewRequestDto reviewRequestDto,
                                                    HttpServletRequest request) {
@@ -52,14 +52,14 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.upateReview(reviewId, email, reviewRequestDto));
     }
 
-    @DeleteMapping("{/reviewId}")
+    @DeleteMapping("/{reviewId}")
     ResponseEntity<ReviewResponseDto> deleteReview(@PathVariable Long reviewId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
         return ResponseEntity.ok(reviewService.deleteReview(reviewId, email));
     }
 
     // 오너
-    @PostMapping("{/reviewId}")
+    @PostMapping("/{reviewId}")
     ResponseEntity<OwnerReviewResponseDto> createOwnerComment(@PathVariable Long reviewId,
                                                               @RequestBody OwnerReviewRequestDto reviewRequestDto,
                                                               HttpServletRequest request) {

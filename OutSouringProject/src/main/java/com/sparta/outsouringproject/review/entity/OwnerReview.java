@@ -15,8 +15,7 @@ public class OwnerReview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long reviewId;
-    private String contents;
+        private String contents;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
@@ -27,7 +26,6 @@ public class OwnerReview {
     private User user;
 
     public OwnerReview(Review review, User user, OwnerReviewRequestDto reviewRequestDto) {
-        this.reviewId = review.getId();
         this.user = user;
         this.contents = reviewRequestDto.getContents();
     }

@@ -12,7 +12,6 @@ public class OwnerReviewResponseDto {
 
     public OwnerReviewResponseDto(OwnerReview savedReview) {
         this.id = savedReview.getId();
-        this.reviewId = savedReview.getReviewId();
         this. contents = savedReview.getContents();
     }
 }
