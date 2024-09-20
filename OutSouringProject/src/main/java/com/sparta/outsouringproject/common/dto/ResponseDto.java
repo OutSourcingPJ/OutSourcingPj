@@ -1,49 +1,49 @@
 package com.sparta.outsouringproject.common.dto;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ResponseDto<T>{
     public int statusCode;
-    public String message = "";
+    public String message;
     public T data;
 
-    @Builder
-    public ResponseDto(int statusCode, String message, T data) {
-        this.statusCode = statusCode;
-        this.message = message;
-        this.data = data;
+
+    public static <T> ResponseDto<T> of(int statusCode, String message, T data) {
+        return ResponseDto.<T>builder()
+            .statusCode(statusCode)
+            .message(message)
+            .data(data)
+            .build();
     }
 
-    /**
-     * 데이터가 없는 경우
-     * @param statusCode
-     * @param message
-     */
-    public ResponseDto(int statusCode, String message) {
-        this.statusCode = statusCode;
-        this.message = message;
+    public static <T> ResponseDto<T> of(int statusCode, T data) {
+        return ResponseDto.<T>builder()
+            .statusCode(statusCode)
+            .message("")
+            .data(data)
+            .build();
     }
 
-    /**
-     * 상태코드만 반환하는 경우
-     * @param statusCode
-     */
-    public ResponseDto(int statusCode) {
-        this.statusCode = statusCode;
+    public static <T> ResponseDto<T> of(int statusCode, String message) {
+        return ResponseDto.<T>builder()
+            .statusCode(statusCode)
+            .message(message)
+            .build();
     }
 
-    /**
-     * 메세지만 없는 경우
-     * @param statusCode
-     * @param data
-     */
-    public ResponseDto(int statusCode, T data) {
-        this.statusCode = statusCode;
-        this.data = data;
+    public static <T> ResponseDto<T> of(int statusCode) {
+        return ResponseDto.<T>builder()
+            .statusCode(statusCode)
+            .build();
     }
 }
+
+
