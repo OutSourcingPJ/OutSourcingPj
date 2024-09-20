@@ -5,6 +5,7 @@ import com.sparta.outsouringproject.cart.dto.CartItemInfo;
 import com.sparta.outsouringproject.cart.dto.CartItemListInfo;
 import com.sparta.outsouringproject.cart.dto.CartItemUpdateRequestDto;
 import com.sparta.outsouringproject.cart.service.CartService;
+import com.sparta.outsouringproject.common.dto.ResponseDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,8 +30,9 @@ public class CartController {
      * 장바구니에 물품 추가
      */
     @PostMapping("/items")
-    public ResponseEntity<CartItemInfo> addItem(@RequestBody AddMenuRequestDto requestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addMenu(null, requestDto));
+    public ResponseEntity<ResponseDto<CartItemInfo>> addItem(@RequestBody AddMenuRequestDto requestDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ResponseDto.of(HttpStatus.CREATED, cartService.addMenu(null, requestDto)));
     }
 
     /**
@@ -40,9 +42,9 @@ public class CartController {
      * @return
      */
     @PatchMapping("/items/{itemId}")
-    public ResponseEntity<CartItemInfo> updateItem(@PathVariable("itemId") Long itemId,
+    public ResponseEntity<ResponseDto<CartItemInfo>> updateItem(@PathVariable("itemId") Long itemId,
         @RequestBody CartItemUpdateRequestDto request){
-        return ResponseEntity.status(HttpStatus.OK).body(cartService.updateQuantity(null, itemId, request));
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.of(HttpStatus.OK, cartService.updateQuantity(null, itemId, request)));
     }
 
     /**
@@ -50,8 +52,8 @@ public class CartController {
      * @return
      */
     @GetMapping("/items/{itemId}")
-    public ResponseEntity<CartItemInfo> getItem(@PathVariable("itemId") Long itemId) {
-        return ResponseEntity.ok().body(cartService.getCartItem(null, itemId));
+    public ResponseEntity<ResponseDto<CartItemInfo>> getItem(@PathVariable("itemId") Long itemId) {
+        return ResponseEntity.ok().body(ResponseDto.of(HttpStatus.OK,cartService.getCartItem(null, itemId)));
     }
 
     /**
@@ -59,25 +61,25 @@ public class CartController {
      * @return
      */
     @GetMapping("/items")
-    public ResponseEntity<CartItemListInfo> getAllItems() {
-        return ResponseEntity.ok().body(cartService.getCartItems(null));
+    public ResponseEntity<ResponseDto<CartItemListInfo>> getAllItems() {
+        return ResponseEntity.ok().body(ResponseDto.of(HttpStatus.OK, cartService.getCartItems(null)));
     }
 
     /**
      * 장바구니에 있는 물품 삭제
      */
     @DeleteMapping("/items/{itemId}")
-    public ResponseEntity<Void> deleteItem(@PathVariable("itemId") Long itemId) {
+    public ResponseEntity<ResponseDto<Void>> deleteItem(@PathVariable("itemId") Long itemId) {
         cartService.deleteItem(null, itemId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, "정상적으로 삭제되었습니다."));
     }
 
     /**
      * 장바구니에 있는 물품 전체 삭제
      */
     @DeleteMapping("/items")
-    public ResponseEntity<Void> deleteAllItems() {
+    public ResponseEntity<ResponseDto<Void>> deleteAllItems() {
         cartService.deleteAllItems(null);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, "정상적으로 삭제되었습니다."));
     }
 }

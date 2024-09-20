@@ -1,5 +1,6 @@
 package com.sparta.outsouringproject.store.controller;
 
+import com.sparta.outsouringproject.common.dto.ResponseDto;
 import com.sparta.outsouringproject.menu.dto.MenuResponseDto;
 import com.sparta.outsouringproject.menu.service.MenuService;
 import com.sparta.outsouringproject.store.dto.*;
@@ -9,9 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/store")
@@ -26,9 +25,10 @@ public class StoreController {
      * @return StoreResponseDto
      */
     @PostMapping
-    public ResponseEntity<StoreResponseDto> saveStore(@RequestBody CreateStoreRequestDto requestDto) {
-        StoreResponseDto responseDto = storeService.save(requestDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    public ResponseEntity<ResponseDto<StoreResponseDto>> saveStore(@RequestBody CreateStoreRequestDto requestDto) {
+        StoreResponseDto responseDto = storeService.saveStore(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ResponseDto.of(HttpStatus.CREATED, "가게가 추가되었습니다.", responseDto));
     }
 
     /**
@@ -37,9 +37,10 @@ public class StoreController {
      * @return GetStoreResponseDto
      */
     @GetMapping("/{storeId}")
-    public ResponseEntity<GetStoreResponseDto> getStore(@PathVariable("storeId") Long storeId) {
+    public ResponseEntity<ResponseDto<GetStoreResponseDto>> getStore(@PathVariable("storeId") Long storeId) {
         GetStoreResponseDto responseDto = storeService.getStore(storeId);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "성공적으로 조회되었습니다.", responseDto));
     }
 
     /**
@@ -48,14 +49,15 @@ public class StoreController {
      * @return GetStoreListResponseDto
      */
     @GetMapping
-    public ResponseEntity<List<GetStoreListResponseDto>> getStores(@RequestParam(value = "name", required = false) String name) {
-        List<GetStoreListResponseDto> storeList;
+    public ResponseEntity<ResponseDto<GetStoreListResponseDto>> getStores(@RequestParam(value = "name", required = false) String name) {
+        GetStoreListResponseDto storeList;
         if (name != null && !name.isEmpty()) {
             storeList = storeService.getStoresByName(name);
         } else {
             storeList = storeService.getStores();
         }
-        return new ResponseEntity<>(storeList, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "성공적으로 조회되었습니다.", storeList));
     }
 
     /**
@@ -64,9 +66,10 @@ public class StoreController {
      * @return StoreResponseDto
      */
     @PatchMapping("/{storeId}")
-    public ResponseEntity<StoreResponseDto> modify(@PathVariable("storeId") Long storeId, @RequestBody ModifyStoreRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<StoreResponseDto>> modify(@PathVariable("storeId") Long storeId, @RequestBody ModifyStoreRequestDto requestDto) {
         StoreResponseDto responseDto = storeService.modify(storeId, requestDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "가게 정보가 수정되었습니다.", responseDto));
     }
 
     /**
@@ -75,11 +78,10 @@ public class StoreController {
      * @return message
      */
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<Map<String, String>> deleteStore(@PathVariable("storeId") Long storeId) {
+    public ResponseEntity<ResponseDto<String>> deleteStore(@PathVariable("storeId") Long storeId) {
         storeService.delete(storeId);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "성공적으로 삭제가 되었습니다.");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "성공적으로 삭제되었습니다."));
     }
 
     // 메뉴 리스트 조회 (가게 ID로 메뉴 리스트 가져오기)
