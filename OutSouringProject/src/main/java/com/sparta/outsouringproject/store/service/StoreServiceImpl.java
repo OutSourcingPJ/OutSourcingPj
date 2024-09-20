@@ -112,21 +112,6 @@ public class StoreServiceImpl implements StoreService{
         if(requestDto.getCloseTime() != null) {
             store.changeCloseTime(requestDto.getCloseTime());
         }
-        // 광고 설정 advertise값을 string으로 true, flase 입력받음, 입력 값에 따라서 세팅 변경
-        if(requestDto.getAdvertise() != null) {
-            if(requestDto.getAdvertise().equals("true")) {
-                if(store.getAdvertise().equals(true)) {
-                    throw new IllegalArgumentException("해당 가게는 이미 광고로 지정되었습니다.");
-                }
-                store.setAdvertise(true);
-            }
-            if(requestDto.getAdvertise().equals("false")) {
-                if(store.getAdvertise().equals(false)) {
-                    throw new IllegalArgumentException("해당 가게는 광고로 지정되지 않았습니다.");
-                }
-                store.setAdvertise(false);
-            }
-        }
         Store newStore = storeRepository.save(store);
         log.info("::: 가게 수정 완료 :::");
         return new StoreResponseDto(newStore);
@@ -143,7 +128,35 @@ public class StoreServiceImpl implements StoreService{
 //        if(!store.getUser().getUserId().equals(ArgumentResolver에서 반환된 userId값)) {
 //            throw new IllegalArgumentException("폐업 권한이 없습니다!");
 //        }
-        store.setStoreStatus(true);
+        store.deleteStore();
         log.info("::: 가게 폐업 완 :::");
+    }
+
+    @Transactional
+    @Override
+    public void checkAdvertise(Long storeId) {
+        log.info("::: 가게 광고 선정 로직 동작 :::");
+        Store store = storeRepository.checkStore(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
+        // 해당 가게의 주인인지 확인하는 로직 필요 추후 추가
+        if(store.getAdvertise().equals(true)) {
+            throw new IllegalArgumentException("해당 가게는 이미 광고로 지정되었습니다.");
+        }
+        store.checkAdvertise();
+        log.info("::: 가게 광고 선정 로직 완 :::");
+    }
+
+    @Transactional
+    @Override
+    public void unCheckAdvertise(Long storeId) {
+        log.info("::: 가게 광고 해제 로직 동작 :::");
+        Store store = storeRepository.checkStore(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
+        // 해당 가게의 주인인지 확인하는 로직 필요 추후 추가
+        if(store.getAdvertise().equals(false)) {
+            throw new IllegalArgumentException("해당 가게는 광고 선정 상태가 아닙니다.");
+        }
+        store.unCheckAdvertise();
+        log.info("::: 가게 광고 해제 로직 완 :::");
     }
 }
