@@ -5,7 +5,6 @@ import com.sparta.outsouringproject.cart.repository.CartItemRepository;
 import com.sparta.outsouringproject.common.enums.OrderStatus;
 import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.menu.repository.MenuRepository;
-import com.sparta.outsouringproject.notification.service.OrderStatusTracker;
 import com.sparta.outsouringproject.order.dto.OrderCreateRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderCreateResponseDto;
 import com.sparta.outsouringproject.order.dto.OrderItemInfo;
@@ -39,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
     private final StoreRepository storeRepository;
     private final CartItemRepository cartItemRepository;
     private final OrderHistoryRepository orderHistoryRepository;
-    private final OrderStatusTracker orderStatusTracker;
 
     @Override
     public OrderCreateResponseDto createOrder(User user, OrderCreateRequestDto orderRequest) {
@@ -107,9 +105,9 @@ public class OrderServiceImpl implements OrderService {
         OrderStatusChangeRequestDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("Store not found"));
 
-//        if(store.getUser() == null || !store.getUser().equals(user)){
-//            throw new IllegalArgumentException("가게의 사장 정보가 없거나, 가게의 사장님이 아닙니다.");
-//        }
+        if(store.getUser() == null || !store.getUser().equals(user)){
+            throw new IllegalArgumentException("가게의 사장 정보가 없거나, 가게의 사장님이 아닙니다.");
+        }
 
         Order order = orderRepository.findByIdOrElseThrow(orderId);
 
@@ -146,12 +144,6 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        orderStatusTracker.onOrderStatusChanged(order.getId(), order.getStatus());
-
-        if(requestDto.getOrderStatus() == OrderStatus.COMPLETED) {
-            // 주문 완료되면 삭제
-            orderRepository.delete(order);
-        }
     }
 
 
