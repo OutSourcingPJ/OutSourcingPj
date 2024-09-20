@@ -1,5 +1,6 @@
 package com.sparta.outsouringproject.store.entity;
 
+import com.sparta.outsouringproject.order.entity.Order;
 import com.sparta.outsouringproject.store.dto.CreateStoreRequestDto;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.menu.entity.Menu;
@@ -33,6 +34,10 @@ public class Store {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
+
     @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
     private List<Menu> menuList = new ArrayList<>();
 

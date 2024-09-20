@@ -2,7 +2,11 @@ package com.sparta.outsouringproject.user.entity;
 
 //import com.sparta.outsouringproject.cart.entity.Cart;
 
+import com.sparta.outsouringproject.cart.entity.Cart;
+import com.sparta.outsouringproject.order.entity.Order;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -30,6 +34,12 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role; // USER 또는 OWNER
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Cart cart;
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders = new ArrayList<>();
 
     @Column
     private boolean isDeleted = false; // 탈퇴 여부

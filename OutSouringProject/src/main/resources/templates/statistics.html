@@ -199,8 +199,8 @@
       fetch(url)
       .then(response => response.json())
       .then(data => {
-        totalSalesAmount  = data.totalSalesAmount;
-        totalOrderCount = data.totalOrderCount;
+        totalSalesAmount  = data.data.totalSalesAmount;
+        totalOrderCount = data.data.totalOrderCount;
 
         // 기존 새로 추가된 차트가 있으면 삭제
         clearNewCharts();
