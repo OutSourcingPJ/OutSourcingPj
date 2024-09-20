@@ -33,7 +33,7 @@ public class Store {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    @OneToMany(mappedBy = "store")
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
     private List<Menu> menuList = new ArrayList<>();
 
     public Store(CreateStoreRequestDto requestDto, User user) {

@@ -18,7 +18,7 @@ import java.util.Optional;
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
-    @Query("SELECT s FROM Store s WHERE s.storeId = :storeId AND s.storeStatus = false")
+    @Query("SELECT s FROM Store s LEFT JOIN FETCH s.menuList WHERE s.storeId = :storeId AND s.storeStatus = false")
     Optional<Store> checkStore(@Param("storeId") Long storeId);
 
     // 모든 가게 반환 리스트 반환
