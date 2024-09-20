@@ -25,6 +25,8 @@ repositories {
 
 dependencies {
     implementation 'at.favre.lib:bcrypt:0.10.2'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
     // JWT
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
