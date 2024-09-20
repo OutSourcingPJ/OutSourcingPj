@@ -4,18 +4,13 @@ import com.sparta.outsouringproject.store.entity.Store;
 import lombok.Getter;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 public class GetStoreListResponseDto {
-    private String name;
-    private Double orderAmount;
-    private LocalTime openTime;
-    private LocalTime closeTime;
+    private List<StoreResponseDto> storeList;
 
-    public GetStoreListResponseDto(Store store) {
-        this.name = store.getName();
-        this.orderAmount = store.getOrderAmount();
-        this.openTime = store.getOpenTime();
-        this.closeTime = store.getCloseTime();
+    public GetStoreListResponseDto(List<StoreResponseDto> storeList) {
+        this.storeList = storeList;
     }
 }
