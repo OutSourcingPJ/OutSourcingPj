@@ -1,6 +1,7 @@
 package com.sparta.outsouringproject.user.config;
 
 
+import com.sparta.outsouringproject.user.entity.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -20,8 +21,6 @@ import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @NoArgsConstructor
@@ -55,7 +54,6 @@ public class JwtUtil {
 
         return BEARER_PREFIX +
                 Jwts.builder()
-
                         .setSubject(email)
                         .claim("email", email)// 사용자 식별자값(ID)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간
@@ -122,10 +120,10 @@ public class JwtUtil {
 
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기
     public String getTokenFromRequest(HttpServletRequest req) {
-        String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
-        }
+//        String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
+//        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+//            return bearerToken.substring(7);
+//        }
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {

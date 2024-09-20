@@ -123,7 +123,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="completedModalLabel">주문 완료</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" onclick="onModalButtonClick()" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -163,6 +163,9 @@
     });
   }
 
+  function onModalButtonClick(){
+    location.reload();
+  }
   // 서버의 SSE 이벤트 수신 및 상태 업데이트
   function trackOrder() {
     const orderId = document.getElementById("orderId").value;

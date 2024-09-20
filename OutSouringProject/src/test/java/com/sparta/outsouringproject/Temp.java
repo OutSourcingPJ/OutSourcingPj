@@ -51,6 +51,9 @@ public class Temp {
     @Order(1)
     public void 유저_생성() throws Exception {
         User user = new User();
+        ReflectionTestUtils.setField(user,"email", "asdfa@mail.com");
+        ReflectionTestUtils.setField(user,"username", "테스토");
+        ReflectionTestUtils.setField(user,"password", "sdafadfs");
         userRepository.save(user);
     }
 
@@ -103,6 +106,7 @@ public class Temp {
         Random rand = new Random();
         for(int i = 0; i<1000; ++i){
             Store store = new Store();
+            ReflectionTestUtils.setField(store, "storeStatus", false);
             ReflectionTestUtils.setField(store, "name", a[rand.nextInt(a.length)]);
             storeRepository.save(store);
         }
