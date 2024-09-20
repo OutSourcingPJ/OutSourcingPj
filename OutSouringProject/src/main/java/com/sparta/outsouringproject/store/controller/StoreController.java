@@ -25,9 +25,10 @@ public class StoreController {
      * @return StoreResponseDto
      */
     @PostMapping
-    public ResponseDto<StoreResponseDto> saveStore(@RequestBody CreateStoreRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<StoreResponseDto>> saveStore(@RequestBody CreateStoreRequestDto requestDto) {
         StoreResponseDto responseDto = storeService.saveStore(requestDto);
-        return ResponseDto.of(200, "가게가 추가되었습니다.", responseDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ResponseDto.of(HttpStatus.CREATED, "가게가 추가되었습니다.", responseDto));
     }
 
     /**
@@ -36,9 +37,10 @@ public class StoreController {
      * @return GetStoreResponseDto
      */
     @GetMapping("/{storeId}")
-    public ResponseDto<GetStoreResponseDto> getStore(@PathVariable("storeId") Long storeId) {
+    public ResponseEntity<ResponseDto<GetStoreResponseDto>> getStore(@PathVariable("storeId") Long storeId) {
         GetStoreResponseDto responseDto = storeService.getStore(storeId);
-        return ResponseDto.of(200, "성공적으로 조회되었습니다.", responseDto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "성공적으로 조회되었습니다.", responseDto));
     }
 
     /**
@@ -47,14 +49,15 @@ public class StoreController {
      * @return GetStoreListResponseDto
      */
     @GetMapping
-    public ResponseDto<GetStoreListResponseDto> getStores(@RequestParam(value = "name", required = false) String name) {
+    public ResponseEntity<ResponseDto<GetStoreListResponseDto>> getStores(@RequestParam(value = "name", required = false) String name) {
         GetStoreListResponseDto storeList;
         if (name != null && !name.isEmpty()) {
             storeList = storeService.getStoresByName(name);
         } else {
             storeList = storeService.getStores();
         }
-        return ResponseDto.of(200, "성공적으로 조회되었습니다.", storeList);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "성공적으로 조회되었습니다.", storeList));
     }
 
     /**
@@ -63,9 +66,10 @@ public class StoreController {
      * @return StoreResponseDto
      */
     @PatchMapping("/{storeId}")
-    public ResponseDto<StoreResponseDto> modify(@PathVariable("storeId") Long storeId, @RequestBody ModifyStoreRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<StoreResponseDto>> modify(@PathVariable("storeId") Long storeId, @RequestBody ModifyStoreRequestDto requestDto) {
         StoreResponseDto responseDto = storeService.modify(storeId, requestDto);
-        return ResponseDto.of(200, "가게 정보가 수정되었습니다.", responseDto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "가게 정보가 수정되었습니다.", responseDto));
     }
 
     /**
@@ -74,9 +78,10 @@ public class StoreController {
      * @return message
      */
     @DeleteMapping("/{storeId}")
-    public ResponseDto<String> deleteStore(@PathVariable("storeId") Long storeId) {
+    public ResponseEntity<ResponseDto<String>> deleteStore(@PathVariable("storeId") Long storeId) {
         storeService.delete(storeId);
-        return ResponseDto.of(200, "성공적으로 삭제되었습니다.");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "성공적으로 삭제되었습니다."));
     }
 
     // 메뉴 리스트 조회 (가게 ID로 메뉴 리스트 가져오기)
