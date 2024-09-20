@@ -1,13 +1,11 @@
 package com.sparta.outsouringproject;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.sparta.outsouringproject.cart.entity.Cart;
-import com.sparta.outsouringproject.cart.entity.CartItem;
 import com.sparta.outsouringproject.cart.repository.CartItemRepository;
 import com.sparta.outsouringproject.cart.repository.CartRepository;
+import com.sparta.outsouringproject.common.enums.OrderStatus;
 import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.menu.repository.MenuRepository;
+import com.sparta.outsouringproject.order.repository.OrderRepository;
 import com.sparta.outsouringproject.statistics.entity.OrderHistory;
 import com.sparta.outsouringproject.statistics.repository.OrderHistoryRepository;
 import com.sparta.outsouringproject.store.entity.Store;
@@ -24,10 +22,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(OrderAnnotation.class)
 public class Temp {
 
@@ -44,6 +43,8 @@ public class Temp {
     private MenuRepository menuRepository;
     @Autowired
     private OrderHistoryRepository orderHistoryRepository;
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Test
     @Rollback(false)
@@ -71,17 +72,8 @@ public class Temp {
     }
 
     @Test
-    public void 장바구니에_추가() throws Exception {
-        // given
-        Menu menu = menuRepository.findById(1L).get();
-        // CartItem cartItem = new CartItem()
-        // when
-
-        // then
-    }
-
-    @Test
     @Rollback(false)
+    @Order(3)
     public void 오더_기록_임시_추가(){
         Random rand = new Random();
         for(long i = 0; i < 1000; ++i) {
@@ -105,6 +97,7 @@ public class Temp {
 
     @Test
     @Rollback(false)
+    @Order(4)
     public void 가게_임시_추가(){
         String[] a = {"BBQ", "BHC","피나치공", "요아정", "화채꽃", "곱분이 곱창","스파게티 마스터"};
         Random rand = new Random();
@@ -113,6 +106,20 @@ public class Temp {
             ReflectionTestUtils.setField(store, "name", a[rand.nextInt(a.length)]);
             storeRepository.save(store);
         }
+    }
+
+    @Test
+    @Rollback(false)
+    @Order(5)
+    public void 주문추가() throws Exception {
+        // given
+        User user = userRepository.findById(1L).get();
+        Store store = storeRepository.findById(2L).get();
+        com.sparta.outsouringproject.order.entity.Order order = new com.sparta.outsouringproject.order.entity.Order(user, store, OrderStatus.WAITING);
+        orderRepository.save(order);
+        // when
+
+        // then
     }
 
     private static LocalDateTime getRandomDateTime(LocalDateTime start, LocalDateTime end) {

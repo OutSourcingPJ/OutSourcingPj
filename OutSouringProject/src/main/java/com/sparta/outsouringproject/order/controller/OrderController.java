@@ -9,6 +9,8 @@ import com.sparta.outsouringproject.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +42,7 @@ public class OrderController {
      */
     @PatchMapping("/stores/{storeId}/orders/{orderId}/status")
     public ResponseEntity<ResponseDto<Void>> acceptOrder(@PathVariable("storeId") Long storeId,
-        @PathVariable("orderId") Long orderId, OrderStatusChangeRequestDto requestDto) {
+        @PathVariable("orderId") Long orderId, @RequestBody OrderStatusChangeRequestDto requestDto) {
         orderService.changeOrderStatus(null, storeId, orderId, requestDto);
         return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, "정상적으로 변경되었습니다."));
     }
