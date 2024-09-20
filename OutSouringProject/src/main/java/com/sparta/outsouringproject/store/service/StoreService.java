@@ -9,4 +9,6 @@ public interface StoreService {
     GetStoreListResponseDto getStoresByName(String name);
     StoreResponseDto modify(Long storeId, ModifyStoreRequestDto requestDto);
     void delete(Long storeId);
+    void checkAdvertise(Long storeId);
+    void unCheckAdvertise(Long storeId);
 }

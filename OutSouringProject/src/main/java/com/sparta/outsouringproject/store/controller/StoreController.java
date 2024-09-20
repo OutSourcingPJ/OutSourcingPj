@@ -91,4 +91,27 @@ public class StoreController {
         return new ResponseEntity<>(menuList, HttpStatus.OK);
     }
 
+    /**
+     * 가계 광고 선정
+     * @param storeId
+     * @return message
+     */
+    @PatchMapping("/advertise/{storeId}")
+    public ResponseEntity<ResponseDto<String>> checkAdvertise(@PathVariable("storeId") Long storeId) {
+        storeService.checkAdvertise(storeId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "해당 업체가 광고로 선정되었습니다."));
+    }
+
+    /**
+     * 가계 광고 해제
+     * @param storeId
+     * @return message
+     */
+    @PatchMapping("/unAdvertise/{storeId}")
+    public ResponseEntity<ResponseDto<String>> unCheckAdvertise(@PathVariable("storeId") Long storeId) {
+        storeService.unCheckAdvertise(storeId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDto.of(200, "해당 업체가 광고에서 해제되었습니다."));
+    }
 }

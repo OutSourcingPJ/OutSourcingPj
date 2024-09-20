@@ -57,4 +57,13 @@ public class Store {
     public void changeCloseTime(LocalTime closeTime) {
         this.closeTime = closeTime;
     }
+    public void deleteStore() {
+        this.storeStatus = true;
+    }
+    public void checkAdvertise() {
+        this.advertise = true;
+    }
+    public void unCheckAdvertise() {
+        this.advertise = false;
+    }
 }

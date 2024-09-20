@@ -10,5 +10,4 @@ public class ModifyStoreRequestDto {
     private Double orderAmount;
     private LocalTime openTime;
     private LocalTime closeTime;
-    private String advertise;
 }
