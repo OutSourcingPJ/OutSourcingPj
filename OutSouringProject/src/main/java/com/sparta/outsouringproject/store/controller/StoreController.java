@@ -48,8 +48,8 @@ public class StoreController {
      * @return GetStoreListResponseDto
      */
     @GetMapping
-    public ResponseEntity<List<GetStoreListResponseDto>> getStores(@RequestParam(value = "name", required = false) String name) {
-        List<GetStoreListResponseDto> storeList;
+    public ResponseEntity<GetStoreListResponseDto> getStores(@RequestParam(value = "name", required = false) String name) {
+        GetStoreListResponseDto storeList;
         if (name != null && !name.isEmpty()) {
             storeList = storeService.getStoresByName(name);
         } else {

@@ -1,6 +1,7 @@
 package com.sparta.outsouringproject.store.repository;
 
 
+import com.sparta.outsouringproject.user.entity.User;
 import lombok.Getter;
 import org.springframework.stereotype.Repository;
 
@@ -28,5 +29,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query("SELECT s FROM Store s WHERE s.storeStatus = false AND s.name LIKE %:name% ORDER BY s.advertise DESC, s.storeId DESC")
     List<Store> findStoresByName(@Param("name") String name);
 
-
+    // 해당 사장님 가게 갯수 카운팅
+    @Query("SELECT COUNT(s) FROM Store s WHERE s.user = :user AND s.storeStatus = false")
+    Long countActiveStoresByUser(@Param("user") User user);
 }
