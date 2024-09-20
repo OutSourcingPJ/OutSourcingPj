@@ -2,9 +2,13 @@ package com.sparta.outsouringproject.review.service;
 
 import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.menu.repository.MenuRepository;
+import com.sparta.outsouringproject.review.dto.request.OwnerReviewRequestDto;
 import com.sparta.outsouringproject.review.dto.request.ReviewRequestDto;
+import com.sparta.outsouringproject.review.dto.response.OwnerReviewResponseDto;
 import com.sparta.outsouringproject.review.dto.response.ReviewResponseDto;
+import com.sparta.outsouringproject.review.entity.OwnerReview;
 import com.sparta.outsouringproject.review.entity.Review;
+import com.sparta.outsouringproject.review.repository.OwnerReviewRepository;
 import com.sparta.outsouringproject.review.repository.ReviewRepository;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
@@ -33,6 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final MenuRepository menuRepository;
     private final UserRepository userRepository;
+    private final OwnerReviewRepository ownerReviewRepository;
 
     @Value("$(file.upload_dir)")
     private String uploadDir;
@@ -49,6 +54,7 @@ public class ReviewServiceImpl implements ReviewService {
             imagePath = saveImage(multipartFile, email);
         }
 
+        //게시물, 이미지 한번에 처리
         Review savedReview = Review.builder()
                 .menu(menu)
                 .user(user)
@@ -85,6 +91,15 @@ public class ReviewServiceImpl implements ReviewService {
         return new ReviewResponseDto(review);
     }
 
+    @Transactional
+    public OwnerReviewResponseDto createOwnerComment(Long reviewId, OwnerReviewRequestDto reviewRequestDto, String email) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("작성 권한이 없습니다.")); // 이넘 활용하여 수정할것
+        OwnerReview savedReview = new OwnerReview(review, user, reviewRequestDto);
+        ownerReviewRepository.save(savedReview);
+        return new OwnerReviewResponseDto(savedReview);
+    }
+
     private String saveImage(MultipartFile multipartFile, String email) throws IOException {
         String userDir = uploadDir + "/" + email;
         Path userPath = Paths.get(userDir);
@@ -100,4 +115,6 @@ public class ReviewServiceImpl implements ReviewService {
 
         return targetLocation.toString();
     }
+
+
 }
