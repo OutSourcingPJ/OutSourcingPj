@@ -37,4 +37,19 @@ public class ReviewService {
         Page<Review> review = reviewRepository.findByMenuIdOrderByCreateAtDesc(pageable, menuId);
         return review.getContent().stream().map(ReviewResponseDto::new).toList();
     }
+
+    @Transactional
+    public ReviewResponseDto upateReview(Long reviewId, String email, ReviewRequestDto reviewRequestDto) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("수정 권한이 없습니다."));
+        review.update(review, user, reviewRequestDto);
+        return new ReviewResponseDto(review);
+    }
+
+    public String deleteReview(Long reviewId, String email) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("삭제 권한이 없습니다."));
+        reviewRepository.delete(review);
+        return review.getId() + "의 리뷰가 삭제되었습니다.";
+    }
 }

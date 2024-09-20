@@ -34,4 +34,10 @@ public class Review {
         this.user = user;
 
     }
+
+    public void update(Review review, User user, ReviewRequestDto reviewRequestDto) {
+    this.id = review.getId();
+    this.contents = reviewRequestDto.getContents();
+    this.user = user;
+    }
 }
