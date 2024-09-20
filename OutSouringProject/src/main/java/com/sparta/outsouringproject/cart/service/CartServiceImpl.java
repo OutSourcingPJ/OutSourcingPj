@@ -37,7 +37,7 @@ public class CartServiceImpl implements CartService {
         Menu menu = menuRepository.findById(requestDto.getMenuId())
             .orElseThrow(() -> new IllegalArgumentException("Menu not found"));
 
-        Cart cart = cartRepository.findByUserId(user)
+        Cart cart = cartRepository.findByUser(user)
             .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
 
         // 장바구니에 물품이 있을 때

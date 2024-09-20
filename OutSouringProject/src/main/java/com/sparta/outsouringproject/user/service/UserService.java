@@ -1,29 +1,28 @@
 package com.sparta.outsouringproject.user.service;
 
+import com.sparta.outsouringproject.cart.entity.Cart;
+import com.sparta.outsouringproject.cart.repository.CartItemRepository;
+import com.sparta.outsouringproject.cart.repository.CartRepository;
 import com.sparta.outsouringproject.user.config.JwtUtil;
 import com.sparta.outsouringproject.user.config.PasswordEncoder;
+import com.sparta.outsouringproject.user.entity.Role;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.sparta.outsouringproject.user.entity.Role;
-
-
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-    }
 
     public void signUp(String password, String username, String email, Role role) {
         if (userRepository.findByEmail(email).isPresent()) { // 이메일로 중복 체크
@@ -41,7 +40,13 @@ public class UserService {
         user.setUsername(username);
         user.setSignupTime(LocalDateTime.now());
 
-        userRepository.save(user);
+
+        user = userRepository.save(user);
+
+        // 카트도 함께 생성
+        Cart cart = new Cart();
+        cart.relatedUser(user);
+        cartRepository.save(cart);
     }
 
     public void deleteAccount(String email, String password) {
@@ -57,6 +62,10 @@ public class UserService {
         }
 
         user.setDeleted(true); // 탈퇴 처리
+
+        // 장바구니 같이 삭제
+        cartRepository.deleteByUser(user);
+
         userRepository.save(user);
     }
 
