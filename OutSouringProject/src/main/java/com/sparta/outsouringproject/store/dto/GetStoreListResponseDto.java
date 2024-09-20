@@ -8,9 +8,9 @@ import java.util.List;
 
 @Getter
 public class GetStoreListResponseDto {
-    private List<StoreResponseDto> data;
+    private List<StoreResponseDto> storeList;
 
-    public GetStoreListResponseDto(List<StoreResponseDto> data) {
-        this.data = data;
+    public GetStoreListResponseDto(List<StoreResponseDto> storeList) {
+        this.storeList = storeList;
     }
 }
