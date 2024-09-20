@@ -1,17 +1,18 @@
 package com.sparta.outsouringproject.statistics.controller;
 
+import com.sparta.outsouringproject.common.dto.ResponseDto;
 import com.sparta.outsouringproject.statistics.dto.StatisticsInfo;
 import com.sparta.outsouringproject.statistics.service.StatisticsService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -55,15 +56,15 @@ public class StatisticsController {
 
     @GetMapping("/api/statistics/stores")
     @ResponseBody
-    private ResponseEntity<StatisticsInfo> getStatisticStore(@RequestParam Long storeId, @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+    private ResponseEntity<ResponseDto<StatisticsInfo>> getStatisticStore(@RequestParam Long storeId, @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
-        return ResponseEntity.ok(statisticsService.getStatistics(storeId, startDate, endDate));
+        return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, statisticsService.getStatistics(storeId, startDate, endDate)));
     }
 
     @GetMapping("/api/statistics")
     @ResponseBody
-    private ResponseEntity<StatisticsInfo> getStatistic(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+    private ResponseEntity<ResponseDto<StatisticsInfo>> getStatistic(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
-        return ResponseEntity.ok(statisticsService.getStatistics(startDate, endDate));
+        return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, statisticsService.getStatistics(startDate, endDate)));
     }
 }

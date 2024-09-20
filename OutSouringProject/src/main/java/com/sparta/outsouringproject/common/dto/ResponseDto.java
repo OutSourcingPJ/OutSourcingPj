@@ -2,9 +2,9 @@ package com.sparta.outsouringproject.common.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,6 +29,22 @@ public class ResponseDto<T>{
 
     public static <T> ResponseDto<T> of(int statusCode) {
         return new ResponseDto<T>(statusCode, "", null);
+    }
+
+    public static <T> ResponseDto<T> of(HttpStatus statusCode, String message, T data) {
+        return new ResponseDto<T>(statusCode.value(), message, data);
+    }
+
+    public static <T> ResponseDto<T> of(HttpStatus statusCode, T data) {
+        return new ResponseDto<T>(statusCode.value(), "", data);
+    }
+
+    public static <T> ResponseDto<T> of(HttpStatus statusCode, String message) {
+        return new ResponseDto<T>(statusCode.value(), message, null);
+    }
+
+    public static <T> ResponseDto<T> of(HttpStatus statusCode) {
+        return new ResponseDto<T>(statusCode.value(), "", null);
     }
 }
 

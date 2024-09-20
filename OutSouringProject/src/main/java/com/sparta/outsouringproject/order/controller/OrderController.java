@@ -1,5 +1,6 @@
 package com.sparta.outsouringproject.order.controller;
 
+import com.sparta.outsouringproject.common.dto.ResponseDto;
 import com.sparta.outsouringproject.order.dto.OrderCreateRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderCreateResponseDto;
 import com.sparta.outsouringproject.order.dto.OrderStatusChangeRequestDto;
@@ -27,17 +28,21 @@ public class OrderController {
      * 주문 요청
      */
     @PostMapping("/orders")
-    public  ResponseEntity<OrderCreateResponseDto> requestOrder(@RequestBody OrderCreateRequestDto orderRequest){
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(null, orderRequest));
+    public ResponseEntity<ResponseDto<OrderCreateResponseDto>> requestOrder(
+        @RequestBody OrderCreateRequestDto orderRequest) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ResponseDto.of(HttpStatus.CREATED, orderService.createOrder(null, orderRequest)));
     }
 
     /**
      * 주문 상태 변경
      */
     @PatchMapping("/stores/{storeId}/orders/{orderId}/status")
-    public  ResponseEntity<Void> acceptOrder(@PathVariable("storeId") Long storeId, @PathVariable("orderId") Long orderId, OrderStatusChangeRequestDto requestDto){
+    public ResponseEntity<ResponseDto<Void>> acceptOrder(@PathVariable("storeId") Long storeId,
+        @PathVariable("orderId") Long orderId, OrderStatusChangeRequestDto requestDto) {
         orderService.changeOrderStatus(null, storeId, orderId, requestDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, "정상적으로 변경되었습니다."));
     }
 
 
@@ -45,7 +50,9 @@ public class OrderController {
      * 현재 주문 상태
      */
     @GetMapping("orders/{orderId}")
-    public ResponseEntity<OrderStatusResponseDto> currentOrderStatus(@PathVariable("orderId") Long orderId) {
-        return new ResponseEntity<>(orderService.getCurrentOrderStatus(null, orderId), HttpStatus.OK);
+    public ResponseEntity<ResponseDto<OrderStatusResponseDto>> currentOrderStatus(
+        @PathVariable("orderId") Long orderId) {
+        return ResponseEntity.ok(
+            ResponseDto.of(HttpStatus.OK, orderService.getCurrentOrderStatus(null, orderId)));
     }
 }
