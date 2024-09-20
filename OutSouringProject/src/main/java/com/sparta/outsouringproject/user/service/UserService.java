@@ -25,27 +25,27 @@ public class UserService {
         this.jwtUtil = jwtUtil;
     }
 
-    public void signUp(String id, String password, String username, Role role) {
-        if (userRepository.findById(id).isPresent()) {
+    public void signUp(String password, String username, String email, Role role) {
+        if (userRepository.findByEmail(email).isPresent()) { // 이메일로 중복 체크
             throw new RuntimeException("중복된 사용자 아이디입니다.");
         }
 
-        if (!isValidEmail(id) || !isValidPassword(password)) {
+        if (!isValidEmail(email) || !isValidPassword(password)) {
             throw new RuntimeException("이메일 또는 비밀번호 형식이 올바르지 않습니다.");
         }
 
         User user = new User();
-        user.setId(id);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole(role);
+        user.setEmail(email);
         user.setUsername(username);
         user.setSignupTime(LocalDateTime.now());
 
         userRepository.save(user);
     }
 
-    public void deleteAccount(String id, String password) {
-        User user = userRepository.findById(id)
+    public void deleteAccount(String email, String password) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         if (user.isDeleted()) {
@@ -60,8 +60,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String login(String id, String password) {
-        User user = userRepository.findByIdAndIsDeletedFalse(id)
+    public String login(String email, String password) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {

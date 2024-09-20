@@ -17,21 +17,21 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public String signUp(@RequestParam String id, @RequestParam String password, @RequestParam String username, @RequestParam String role) {
+    public String signUp(@RequestParam String password, @RequestParam String username, @RequestParam String email, @RequestParam String role) {
         Role userRole = Role.valueOf(role.toUpperCase()); // 문자열을 Enum으로 변환
-        userService.signUp(id, password, username, userRole);
+        userService.signUp(password, username, email, userRole);
         return "회원가입 성공";
     }
 
     @DeleteMapping("/delete")
-    public String deleteAccount(@RequestParam String id, @RequestParam String password) {
-        userService.deleteAccount(id, password);
+    public String deleteAccount(@RequestParam String email, @RequestParam String password) {
+        userService.deleteAccount(email, password);
         return "회원탈퇴 성공";
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String id, @RequestParam String password) {
-        String token = userService.login(id, password); // JWT 토큰을 받음
+    public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password) {
+        String token = userService.login(email, password); // JWT 토큰을 받음
         return ResponseEntity.ok(token); // JWT 토큰 반환
     }
 }

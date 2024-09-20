@@ -13,14 +13,17 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @Column(nullable = false, unique = true)
-    private String id; // 이메일로 사용자 ID 설정
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // 이메일로 사용자 ID 설정
 
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
     private String username;
+
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @Column
     private LocalDateTime signupTime;
