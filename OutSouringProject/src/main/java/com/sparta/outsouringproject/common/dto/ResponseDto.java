@@ -1,4 +1,4 @@
-package com.sparta.outsouringproject.common.entity;
+package com.sparta.outsouringproject.common.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
