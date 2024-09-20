@@ -88,17 +88,17 @@ public class Temp {
             long price = rand.nextLong(5000L, 50000L);
             long quantity = rand.nextLong(1, 4);
             OrderHistory history = OrderHistory
-                    .builder()
-                    .soldDate(getRandomDateTime(LocalDateTime.now().minusDays(50), LocalDateTime.now().plusDays(50)))
-                    .soldPrice(price)
-                    .storeId(rand.nextLong(1, 15))
-                    .orderId(i + 1)
-                    .userId(rand.nextLong(1, 50))
-                    .quantity(quantity)
-                    .soldTotalPrice(price * quantity)
-                    .menuId(1l)
-                    .menuName("치킨")
-                    .build();
+                .builder()
+                .soldDate(getRandomDateTime(LocalDateTime.now().minusDays(50), LocalDateTime.now().plusDays(50)))
+                .soldPrice(price)
+                .storeId(rand.nextLong(1, 15))
+                .orderId(i + 1)
+                .userId(rand.nextLong(1, 50))
+                .quantity(quantity)
+                .soldTotalPrice(price * quantity)
+                .menuId(1l)
+                .menuName("치킨")
+                .build();
             orderHistoryRepository.save(history);
         }
     }

@@ -2,13 +2,12 @@ package com.sparta.outsouringproject.common.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ResponseDto<T>{
     public int statusCode;
@@ -17,32 +16,35 @@ public class ResponseDto<T>{
 
 
     public static <T> ResponseDto<T> of(int statusCode, String message, T data) {
-        return ResponseDto.<T>builder()
-            .statusCode(statusCode)
-            .message(message)
-            .data(data)
-            .build();
+        return new ResponseDto<T>(statusCode, message, data);
     }
 
     public static <T> ResponseDto<T> of(int statusCode, T data) {
-        return ResponseDto.<T>builder()
-            .statusCode(statusCode)
-            .message("")
-            .data(data)
-            .build();
+        return new ResponseDto<T>(statusCode, "", data);
     }
 
     public static <T> ResponseDto<T> of(int statusCode, String message) {
-        return ResponseDto.<T>builder()
-            .statusCode(statusCode)
-            .message(message)
-            .build();
+        return new ResponseDto<T>(statusCode, message, null);
     }
 
     public static <T> ResponseDto<T> of(int statusCode) {
-        return ResponseDto.<T>builder()
-            .statusCode(statusCode)
-            .build();
+        return new ResponseDto<T>(statusCode, "", null);
+    }
+
+    public static <T> ResponseDto<T> of(HttpStatus statusCode, String message, T data) {
+        return new ResponseDto<T>(statusCode.value(), message, data);
+    }
+
+    public static <T> ResponseDto<T> of(HttpStatus statusCode, T data) {
+        return new ResponseDto<T>(statusCode.value(), "", data);
+    }
+
+    public static <T> ResponseDto<T> of(HttpStatus statusCode, String message) {
+        return new ResponseDto<T>(statusCode.value(), message, null);
+    }
+
+    public static <T> ResponseDto<T> of(HttpStatus statusCode) {
+        return new ResponseDto<T>(statusCode.value(), "", null);
     }
 }
 
