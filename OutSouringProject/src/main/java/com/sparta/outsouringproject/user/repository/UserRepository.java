@@ -5,7 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, String> {
-    Optional<User> findByIdAndIsDeletedFalse(String id); // 삭제되지 않은 사용자 찾기
-    Optional<User> findById(String id); // 사용자 찾기 (탈퇴 여부 무관)
+public interface UserRepository extends JpaRepository<User, Long> {
+    // ID로 사용자를 찾는 메소드
+    Optional<User> findByIdAndIsDeletedFalse(Long id);
+
+    // 이메일로 사용자를 찾는 메소드 추가
+    Optional<User> findByEmailAndIsDeletedFalse(String email);
+
+    // 이메일로 사용자를 찾는 메소드 (탈퇴 상태와 관계없이)
+    Optional<User> findByEmail(String email);
 }
