@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store Statistics Page</title>
+
+  <!-- Chart.js for graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- 기본 CSS 스타일 -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    .statistics h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .statistics span {
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    /* 날짜 선택 영역 */
+    .date-selection {
+      margin-bottom: 20px;
+    }
+
+    .date-selection label {
+      margin-right: 10px;
+    }
+
+    .button-container {
+      margin-top: 10px;
+    }
+
+    /* 차트 영역 조정 */
+    .charts-container {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .chart-wrapper {
+      margin-top: 20px;
+    }
+
+    canvas {
+      max-width: 300px;
+      max-height: 300px;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 메인 콘텐츠 -->
+<div class="content">
+  <h1>Store Statistics</h1>
+
+  <div class="card">
+    <div class="statistics">
+    <h2>Store Name</h2>
+    <span id="storeName"></span>
+      </div>
+  </div>
+  <!-- 월간/일간 통계 영역 (페이지 로드 시 표시) -->
+  <div class="card">
+    <div class="statistics">
+      <h2>Daily Sales Amount</h2>
+      <span id="dailySalesAmount"></span> 원
+    </div>
+    <div class="statistics">
+      <h2>Daily Order Count</h2>
+      <span id="dailyOrderCount"></span> 건
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="statistics">
+      <h2>Monthly Sales Amount</h2>
+      <span id="monthlySalesAmount"></span> 원
+    </div>
+    <div class="statistics">
+      <h2>Monthly Order Count</h2>
+      <span id="monthlyOrderCount"></span> 건
+    </div>
+  </div>
+  <!-- 페이지 로드 시 기본 차트 -->
+  <div class="charts-container">
+    <!-- 기존 매출 차트 -->
+    <canvas id="initialSalesChart" width="300" height="300"></canvas>
+
+    <!-- 기존 주문 건수 차트 -->
+    <canvas id="initialOrderCountChart" width="300" height="300"></canvas>
+  </div>
+  <!-- 날짜 선택 영역 -->
+  <div class="date-selection">
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" name="startDate">
+
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" name="endDate">
+
+    <div class="button-container">
+      <!-- 통계 보기 버튼 -->
+      <button id="showStatisticsBtn">Show Statistics</button>
+    </div>
+  </div>
+
+  <!-- 새로 추가될 차트 영역 (사용자가 날짜를 선택할 때 표시) -->
+  <div id="newChartsArea" class="charts-container"></div>
+
+</div>
+
+<script>
+  // 숫자 포맷팅 (쉼표 추가)
+  function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  // Thymeleaf에서 전달된 값들 (가게 이름을 포함)
+  const storeId = [[${storeId}]];
+  const storeName = '[[${storeName}]]';
+  let dailySalesAmount = [[${dailySalesAmount}]];
+  let dailyOrderCount = [[${dailyOrderCount}]];
+  let monthlySalesAmount = [[${monthlySalesAmount}]];
+  let monthlyOrderCount = [[${monthlyOrderCount}]];
+
+  // 초기 통계 값을 표시하는 함수
+  function displayInitialStatistics() {
+    document.getElementById('storeName').textContent = storeName; // storeName 표시
+    document.getElementById('dailySalesAmount').textContent = formatNumber(dailySalesAmount);
+    document.getElementById('dailyOrderCount').textContent = dailyOrderCount;
+    document.getElementById('monthlySalesAmount').textContent = formatNumber(monthlySalesAmount);
+    document.getElementById('monthlyOrderCount').textContent = monthlyOrderCount;
+  }
+
+  // 페이지 로드 시 기본 차트 생성
+  function createInitialCharts() {
+    const salesChartCtx = document.getElementById('initialSalesChart').getContext('2d');
+    const orderCountChartCtx = document.getElementById('initialOrderCountChart').getContext('2d');
+
+    // 매출 차트 생성
+    new Chart(salesChartCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Sales Amount'],
+        datasets: [{
+          label: 'Daily Sales',
+          data: [parseFloat(dailySalesAmount)],
+          backgroundColor: ['rgba(54, 162, 235, 0.2)'],
+          borderColor: ['rgba(54, 162, 235, 1)'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+
+    // 주문 건수 차트 생성
+    new Chart(orderCountChartCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Order Count'],
+        datasets: [{
+          label: 'Daily Orders',
+          data: [parseFloat(dailyOrderCount)],
+          backgroundColor: ['rgba(255, 159, 64, 0.2)'],
+          borderColor: ['rgba(255, 159, 64, 1)'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+  }
+
+  let totalSalesAmount = 0;
+  let totalOrderCount = 0;
+
+  // 날짜 선택 후 통계 요청
+  document.getElementById('showStatisticsBtn').addEventListener('click', function () {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    if (startDate && endDate) {
+      const url = `/api/statistics/stores?storeId=${storeId}&startDate=${startDate}&endDate=${endDate}`;
+
+      // Fetch 통계 데이터를 받아와서 차트 업데이트
+      fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        totalSalesAmount = data.data.totalSalesAmount;
+        totalOrderCount = data.data.totalOrderCount;
+
+        // 기존 새로 추가된 차트가 있으면 삭제
+        clearNewCharts();
+
+        // 새로 추가된 차트 생성
+        createNewCharts();
+      })
+      .catch(error => console.error('Error:', error));
+    } else {
+      alert('Please select both start and end dates.');
+    }
+  });
+
+  // 새로운 차트를 추가하는 함수 (사용자가 날짜를 입력한 후 표시)
+  function createNewCharts() {
+    // 차트를 삽입할 div 요소를 생성
+    const chartWrapper = document.createElement('div');
+    chartWrapper.classList.add('chart-wrapper');
+
+    // Daily Sales Chart 캔버스 생성
+    const salesCanvas = document.createElement('canvas');
+    salesCanvas.width = 300;
+    salesCanvas.height = 300;
+    chartWrapper.appendChild(salesCanvas);
+
+    // Daily Order Count Chart 캔버스 생성
+    const orderCountCanvas = document.createElement('canvas');
+    orderCountCanvas.width = 300;
+    orderCountCanvas.height = 300;
+    chartWrapper.appendChild(orderCountCanvas);
+
+    // 새로 만든 차트를 newChartsArea에 추가
+    document.getElementById('newChartsArea').appendChild(chartWrapper);
+
+    // 매출 차트 생성
+    const salesChartCtx = salesCanvas.getContext('2d');
+    new Chart(salesChartCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Sales Amount'],
+        datasets: [{
+          label: 'Total Sales',
+          data: [parseFloat(totalSalesAmount)],
+          backgroundColor: ['rgba(54, 162, 235, 0.2)'],
+          borderColor: ['rgba(54, 162, 235, 1)'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+
+    // 주문 건수 차트 생성
+    const orderCountChartCtx = orderCountCanvas.getContext('2d');
+    new Chart(orderCountChartCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Order Count'],
+        datasets: [{
+          label: 'Total Orders',
+          data: [parseFloat(totalOrderCount)],
+          backgroundColor: ['rgba(255, 159, 64, 0.2)'],
+          borderColor: ['rgba(255, 159, 64, 1)'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+  }
+
+  // 새로 추가된 차트를 초기화하는 함수
+  function clearNewCharts() {
+    const newChartsArea = document.getElementById('newChartsArea');
+    newChartsArea.innerHTML = '';  // 새로운 차트 영역 초기화
+  }
+
+  // 초기 통계 값과 차트를 표시
+  displayInitialStatistics();
+  createInitialCharts();
+</script>
+
+</body>
+</html>

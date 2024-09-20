@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>주문 상태 추적</title>
+  <!-- Bootstrap CSS CDN -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    /* 기본적인 스타일 */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .status-header {
+      font-size: 24px;
+      color: #4CAF50;
+      margin-bottom: 20px;
+    }
+
+    .progressbar-container {
+      display: none; /* 처음에는 숨김 */
+      margin-top: 30px; /* 진행바 상단 마진 추가 */
+    }
+
+    /* StepProgressBar 관련 스타일 */
+    .progressbar {
+      counter-reset: step;
+      list-style-type: none;
+      display: flex;
+      justify-content: space-between;
+      margin: 0;
+      padding: 0;
+    }
+
+    .progressbar li {
+      position: relative;
+      width: 25%;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: #9b9b9b;
+    }
+
+    .progressbar li:before {
+      content: counter(step);
+      counter-increment: step;
+      width: 30px;
+      height: 30px;
+      border: 2px solid #ddd;
+      display: block;
+      text-align: center;
+      margin: 0 auto 10px;
+      line-height: 30px;
+      border-radius: 50%;
+      background-color: #fff;
+    }
+
+    .progressbar li:after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background-color: #ddd;
+      top: 15px;
+      left: -50%;
+      z-index: -1;
+    }
+
+    /* 첫 번째 원 앞에는 선이 없도록 설정 */
+    .progressbar li:first-child:after {
+      content: none;
+    }
+
+    /* 활성화된 상태 표시 */
+    .progressbar li.active:before {
+      border-color: #4CAF50;
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    /* 활성화된 단계에 연결된 선 */
+    .progressbar li.active + li:after {
+      background-color: #4CAF50;
+    }
+
+    /* 현재 진행 중인 상태에 대한 효과 추가 (Pulse 효과) */
+    .progressbar li.current:before {
+      border-color: #ff9800;
+      background-color: #ff9800;
+      color: white;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+<div class="status-header">주문 상태</div>
+<div class="input-container">
+  <input type="text" id="orderId" placeholder="주문 ID 입력">
+  <button class="btn btn-success" onclick="trackOrder()">추적 시작</button>
+</div>
+
+<!-- 진행 바 컨테이너 -->
+<div class="progressbar-container" id="progressbarContainer">
+  <ul class="progressbar" id="progressbar">
+    <li class="active">대기</li>
+    <li>수락</li>
+    <li>배달</li>
+    <li>완료</li>
+  </ul>
+</div>
+
+<!-- Bootstrap 모달 -->
+<div class="modal fade" id="completedModal" tabindex="-1" role="dialog" aria-labelledby="completedModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="completedModalLabel">주문 완료</h5>
+        <button type="button" onclick="onModalButtonClick()" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        주문이 완료되었습니다! 배달이 무사히 완료되었습니다.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS and jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  let eventSource;
+  let currentStep = 0;
+  const statusList = ["WAITING", "ACCEPTED", "DELIVERY", "COMPLETED"];
+
+  // ProgressBar 업데이트 함수
+  function updateProgressBar(step) {
+    const steps = document.querySelectorAll('.progressbar li');
+    steps.forEach((stepElement, index) => {
+      if (index <= step) {
+        stepElement.classList.add('active');
+      } else {
+        stepElement.classList.remove('active');
+      }
+      if (index === step) {
+        stepElement.classList.add('current'); // 현재 진행 중인 상태
+      } else {
+        stepElement.classList.remove('current');
+      }
+    });
+  }
+
+  function onModalButtonClick(){
+    location.reload();
+  }
+  // 서버의 SSE 이벤트 수신 및 상태 업데이트
+  function trackOrder() {
+    const orderId = document.getElementById("orderId").value;
+    if (eventSource) {
+      eventSource.close(); // 기존 이벤트 소스 종료
+    }
+
+    // 진행바 표시
+    document.getElementById('progressbarContainer').style.display = 'block';
+
+    // SSE 연결
+    eventSource = new EventSource(`/connect/${orderId}`);
+
+    eventSource.onmessage = function(event) {
+      const status = event.data;
+      const stepIndex = statusList.indexOf(status); // 상태 이름으로 인덱스 찾기
+
+      if (stepIndex !== -1) {
+        updateProgressBar(stepIndex); // ProgressBar 업데이트
+      }
+
+      if (status === "COMPLETED") {
+        // 배달 완료 시 모달창 표시
+        $('#completedModal').modal('show');
+        eventSource.close(); // 주문이 완료되면 SSE 연결 종료
+      }
+    };
+
+    eventSource.addEventListener("error", function(event) {
+      const errorMessage = event.data; // 서버에서 전송된 에러 메시지
+      alert("에러: " + errorMessage); // 에러 메시지를 알림으로 표시
+      document.getElementById('progressbarContainer').style.display = 'none';
+      eventSource.close(); // 에러 발생 시 SSE 연결 종료
+    });
+
+    eventSource.onerror = function(event) {
+      eventSource.close();
+    };
+  }
+</script>
+</body>
+</html>

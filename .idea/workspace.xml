@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="9a58acb2-3e81-49d6-b046-4c1b59c83d24" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/OutSourcingPj.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/gradlew" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/gradlew.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/OutSouringProjectApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/common/exceptions/TempException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/order/dto/OrderStatusChangeRequestDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/user/controller/UserController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/user/dto/Temp.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/user/service/UserService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/test/java/com/sparta/outsouringproject/OutSouringProjectApplicationTests.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2mKOmL32xSzhvUFoRk7pLO6OnqB" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/outsourcing/OutSouringProject",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-b114ca120d71-intellij.indexing.shared.core-IU-242.20224.300" />
+        <option value="bundled-js-predefined-d6986cc7102b-410509235cf1-JavaScript-IU-242.20224.300" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9a58acb2-3e81-49d6-b046-4c1b59c83d24" name="Changes" comment="" />
+      <created>1726821958465</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1726821958465</updated>
+      <workItem from="1726821959489" duration="53000" />
+      <workItem from="1726822018453" duration="23000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
