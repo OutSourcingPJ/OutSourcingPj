@@ -61,7 +61,7 @@ public class CartServiceImpl implements CartService {
         return CartItemInfo.builder()
             .cartItemId(cartItem.getId())
             .price(menuPrice)
-            .menuId(menu.getMenuId())
+            .menuId(menu.getMenu_id())
             .menuName(menu.getMenuName())
             .quantity(1L)
             .totalPrice(cartItem.getTotalPrice())
@@ -74,7 +74,7 @@ public class CartServiceImpl implements CartService {
         CartItem cartItem = cartItemRepository.findCartItemByIdOrElseThrow(cartItemId);
 
         Menu menu = cartItem.getMenu();
-        Long menuId = menu.getMenuId();
+        Long menuId = menu.getMenu_id();
         String menuName = menu.getMenuName();
 
         cartItem.updateQuantity(requestDto.getQuantity());
@@ -92,7 +92,7 @@ public class CartServiceImpl implements CartService {
     public CartItemInfo getCartItem(User user, Long cartItemId) {
         CartItem cartItem = cartItemRepository.findCartItemByIdOrElseThrow(cartItemId);
         Menu menu = cartItem.getMenu();
-        Long menuId = menu.getMenuId();
+        Long menuId = menu.getMenu_id();
         String menuName = menu.getMenuName();
 
         return CartItemInfo.builder()
@@ -112,7 +112,7 @@ public class CartServiceImpl implements CartService {
             .map(x -> CartItemInfo.builder()
                 .cartItemId(x.getId())
                 .price(x.getPrice())
-                .menuId(x.getMenu().getMenuId())
+                .menuId(x.getMenu().getMenu_id())
                 .menuName(x.getMenu().getMenuName())
                 .quantity(x.getQuantity())
                 .totalPrice(x.getTotalPrice())
