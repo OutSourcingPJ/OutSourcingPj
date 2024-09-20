@@ -24,7 +24,7 @@ public class ResponseDto<T>{
     }
 
     public static <T> ResponseDto<T> of(int statusCode, String message) {
-        return new ResponseDto<T>(statusCode, "", null);
+        return new ResponseDto<T>(statusCode, message, null);
     }
 
     public static <T> ResponseDto<T> of(int statusCode) {
