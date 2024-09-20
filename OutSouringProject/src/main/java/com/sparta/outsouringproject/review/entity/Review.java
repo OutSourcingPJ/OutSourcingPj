@@ -10,6 +10,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Table(name = "review")
@@ -29,6 +32,10 @@ public class Review extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id")
     private Menu menu;
+
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
+    private List<OwnerReview> ownerReview = new ArrayList<>();
+
 
     public Review(Menu menu, User user, ReviewRequestDto reviewRequestDto) {
         this.id = reviewRequestDto.getId();
