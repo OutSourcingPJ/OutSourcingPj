@@ -33,7 +33,7 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(@RequestParam String email, @RequestParam String password, HttpServletResponse response) {
-        String token = userService.login(email, password); // JWT 토큰을 받음
+        String token = userService.login(email, password, response); // JWT 토큰을 받음
         // 쿠키에 토큰 넣어줘야 함
         jwtUtil.addJwtToCookie(token, response);
         return "redirect:/"; // JWT 토큰 반환
