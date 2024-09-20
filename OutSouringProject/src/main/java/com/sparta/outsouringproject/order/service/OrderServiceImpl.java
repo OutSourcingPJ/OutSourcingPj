@@ -129,7 +129,7 @@ public class OrderServiceImpl implements OrderService {
                     .orderId(item.getOrder().getId())
                     .storeId(item.getOrder().getStore().getStoreId())
                     .userId(item.getOrder().getUser().getId())
-                    .menuId(item.getMenu().getMenuId())
+                    .menuId(item.getMenu().getMenu_id())
                     .menuName(item.getMenu().getMenuName())
                     .quantity(item.getQuantity())
                     .soldPrice(item.getPrice())
