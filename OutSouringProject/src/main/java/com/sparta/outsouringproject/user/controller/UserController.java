@@ -1,13 +1,10 @@
 package com.sparta.outsouringproject.user.controller;
 
 import com.sparta.outsouringproject.user.config.JwtUtil;
+import com.sparta.outsouringproject.user.dto.LoginRequestDto;
 import com.sparta.outsouringproject.user.service.UserService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.sparta.outsouringproject.user.entity.Role;
 
@@ -36,10 +33,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam(name = "email") String email, @RequestParam(name = "password") String password, HttpServletResponse response) {
-        String token = userService.login(email, password, response); // JWT 토큰을 받음
+    public String login(@RequestBody LoginRequestDto loginRequestDto,  HttpServletResponse response) {
+        String token = userService.login(loginRequestDto, response); // JWT 토큰을 받음
         // 쿠키에 토큰 넣어줘야 함
         jwtUtil.addJwtToCookie(token, response);
-        return "redirect:/"; // JWT 토큰 반환
+        return token;
     }
 }
