@@ -1,20 +1,22 @@
 package com.sparta.outsouringproject.user.controller;
 
+import com.sparta.outsouringproject.user.config.JwtUtil;
 import com.sparta.outsouringproject.user.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.sparta.outsouringproject.user.entity.Role;
 
-@RestController
+@Controller
+@RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/signup")
     public String signUp(@RequestParam String password, @RequestParam String username, @RequestParam String email, @RequestParam String role) {
@@ -30,8 +32,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password) {
-        String token = userService.login(email, password); // JWT 토큰을 받음
-        return ResponseEntity.ok(token); // JWT 토큰 반환
+    public String login(@RequestParam String email, @RequestParam String password, HttpServletResponse response) {
+        String token = userService.login(email, password, response); // JWT 토큰을 받음
+        // 쿠키에 토큰 넣어줘야 함
+        jwtUtil.addJwtToCookie(token, response);
+        return "redirect:/"; // JWT 토큰 반환
     }
 }
