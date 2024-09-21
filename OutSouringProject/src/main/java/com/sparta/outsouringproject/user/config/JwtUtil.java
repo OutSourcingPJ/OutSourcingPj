@@ -49,13 +49,14 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String createToken(String email) {
+    public String createToken(Long id, String email, Role role) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(email)
-                        .claim("email", email)// 사용자 식별자값(ID)
+                        .setSubject(String.valueOf(id)) // 사용자 식별자값(ID)
+                        .claim("email", email) // 사용자 이메일(email)
+                        .claim("userRole", role) // 사용자 권한
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간
                         .setIssuedAt(date) // 발급일
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘

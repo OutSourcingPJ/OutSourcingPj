@@ -3,6 +3,7 @@ package com.sparta.outsouringproject.store.service;
 import com.sparta.outsouringproject.store.dto.*;
 import com.sparta.outsouringproject.store.entity.Store;
 import com.sparta.outsouringproject.store.repository.StoreRepository;
+import com.sparta.outsouringproject.user.entity.Role;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,16 +24,17 @@ public class StoreServiceImpl implements StoreService{
     // 가게 저장
     @Transactional
     @Override
-    public StoreResponseDto saveStore(CreateStoreRequestDto requestDto) {
+    public StoreResponseDto saveStore(CreateStoreRequestDto requestDto, String email) {
         log.info("::: 가게 저장 로직 동작 :::");
-        Long userId = 1L;
-        User user = userRepository.findById(userId)
+
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다!"));
 
+        log.info("::: 회원 검사 로직 동작 :::");
         // 회원파트 생성되면 적용 + delte값 설정되어있을테니 findById에서 JPQL로 수정
-//        if(user.getRole() != RoleType.OWNER) {
-//            throw new IllegalArgumentException("해당 회원은 가게 등록 권한이 없습니다!");
-//        }
+        if(user.getRole() != Role.OWNER) {
+            throw new IllegalArgumentException("해당 회원은 가게 등록 권한이 없습니다!");
+        }
         log.info("::: 가게 갯수 확인 :::");
         Long storeCount = storeRepository.countActiveStoresByUser(user);
         if(storeCount >= 3) {

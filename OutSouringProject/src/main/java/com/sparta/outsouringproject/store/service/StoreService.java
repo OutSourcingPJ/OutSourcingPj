@@ -3,7 +3,7 @@ package com.sparta.outsouringproject.store.service;
 import com.sparta.outsouringproject.store.dto.*;
 
 public interface StoreService {
-    StoreResponseDto saveStore(CreateStoreRequestDto requestDto);
+    StoreResponseDto saveStore(CreateStoreRequestDto requestDto, String email);
     GetStoreResponseDto getStore(Long storeId);
     GetStoreListResponseDto getStores();
     GetStoreListResponseDto getStoresByName(String name);
