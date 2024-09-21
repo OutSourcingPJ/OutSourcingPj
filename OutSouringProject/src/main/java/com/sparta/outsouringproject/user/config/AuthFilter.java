@@ -2,6 +2,7 @@ package com.sparta.outsouringproject.user.config;
 
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -43,12 +44,20 @@ public class AuthFilter implements Filter {
                     throw new IllegalArgumentException("Token Error");
                 }
 
-                // 토큰에서 사용자 정보 가져오기
+                // 토큰에서 사용자 정보 가져오기 ArgumentResolver에 사용하기 위해 미리 set
+                Claims claims = jwtUtil.getUserInfoFromToken(token);
+                httpServletRequest.setAttribute("id", Long.parseLong(claims.getSubject()));
+                httpServletRequest.setAttribute("email", claims.get("email"));
+                httpServletRequest.setAttribute("role", claims.get("role"));
+
+                // 진용님이 만드신거 나중에 ArgumentResolver 사용하면 없어도 될듯
                 String email = jwtUtil.getEmailFromToken(token);
 
                 User user = userRepository.findByEmail(email).orElseThrow(() ->
                         new NullPointerException("Not Found User")
                 );
+
+
 
                 request.setAttribute("email", email);
                 chain.doFilter(request, response); // 다음 Filter 로 이동

@@ -6,10 +6,27 @@
         <webroots />
       </configuration>
     </facet>
+    <facet type="jpa" name="JPA">
+      <configuration>
+        <setting name="validation-enabled" value="true" />
+        <setting name="provider-name" value="Hibernate" />
+        <datasource-mapping>
+          <factory-entry name="OutSouringProject.test" />
+          <factory-entry name="entityManagerFactory" />
+        </datasource-mapping>
+        <naming-strategy-map />
+      </configuration>
+    </facet>
+    <facet type="Spring" name="Spring">
+      <configuration />
+    </facet>
   </component>
   <component name="NewModuleRootManager">
     <output-test url="file://$MODULE_DIR$/../../OutSouringProject/build/classes/java/test" />
     <exclude-output />
+    <content url="file://$MODULE_DIR$/../../OutSouringProject/src/test">
+      <sourceFolder url="file://$MODULE_DIR$/../../OutSouringProject/src/test/java" isTestSource="true" />
+    </content>
     <content url="file://$MODULE_DIR$/../../OutSouringProject/src/test">
       <sourceFolder url="file://$MODULE_DIR$/../../OutSouringProject/src/test/java" isTestSource="true" />
     </content>

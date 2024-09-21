@@ -5,6 +5,7 @@ import com.sparta.outsouringproject.menu.dto.MenuResponseDto;
 import com.sparta.outsouringproject.menu.service.MenuService;
 import com.sparta.outsouringproject.store.dto.*;
 import com.sparta.outsouringproject.store.service.StoreService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,9 @@ public class StoreController {
      * @return StoreResponseDto
      */
     @PostMapping
-    public ResponseEntity<ResponseDto<StoreResponseDto>> saveStore(@RequestBody CreateStoreRequestDto requestDto) {
-        StoreResponseDto responseDto = storeService.saveStore(requestDto);
+    public ResponseEntity<ResponseDto<StoreResponseDto>> saveStore(@RequestBody CreateStoreRequestDto requestDto, HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
+        StoreResponseDto responseDto = storeService.saveStore(requestDto, email);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ResponseDto.of(HttpStatus.CREATED, "가게가 추가되었습니다.", responseDto));
     }
