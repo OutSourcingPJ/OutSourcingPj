@@ -32,4 +32,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     // 해당 사장님 가게 갯수 카운팅
     @Query("SELECT COUNT(s) FROM Store s WHERE s.user = :user AND s.storeStatus = false")
     Long countActiveStoresByUser(@Param("user") User user);
+
+    // 가게 id로 가져올 때 orders 페치 조인
+    @Query("SELECT s FROM Store s JOIN FETCH s.orders WHERE s.storeId = :id")
+    Optional<Store> findStoreWithOrdersById(@Param("id") Long id);
 }

@@ -1,25 +1,30 @@
 package com.sparta.outsouringproject.order.service;
 
-import com.sparta.outsouringproject.cart.dto.CartItemInfo;
+import com.sparta.outsouringproject.cart.entity.CartItem;
 import com.sparta.outsouringproject.cart.repository.CartItemRepository;
+import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.common.enums.OrderStatus;
+import com.sparta.outsouringproject.common.exceptions.AccessDeniedException;
+import com.sparta.outsouringproject.common.exceptions.AuthException;
+import com.sparta.outsouringproject.common.exceptions.InvalidRequestException;
 import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.menu.repository.MenuRepository;
 import com.sparta.outsouringproject.notification.service.OrderStatusTracker;
-import com.sparta.outsouringproject.order.dto.OrderCreateRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderCreateResponseDto;
 import com.sparta.outsouringproject.order.dto.OrderItemInfo;
 import com.sparta.outsouringproject.order.dto.OrderStatusChangeRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderStatusResponseDto;
 import com.sparta.outsouringproject.order.entity.Order;
-import com.sparta.outsouringproject.statistics.entity.OrderHistory;
 import com.sparta.outsouringproject.order.entity.OrderItem;
-import com.sparta.outsouringproject.statistics.repository.OrderHistoryRepository;
 import com.sparta.outsouringproject.order.repository.OrderItemRepository;
 import com.sparta.outsouringproject.order.repository.OrderRepository;
+import com.sparta.outsouringproject.statistics.entity.OrderHistory;
+import com.sparta.outsouringproject.statistics.repository.OrderHistoryRepository;
 import com.sparta.outsouringproject.store.entity.Store;
 import com.sparta.outsouringproject.store.repository.StoreRepository;
+import com.sparta.outsouringproject.user.entity.Role;
 import com.sparta.outsouringproject.user.entity.User;
+import com.sparta.outsouringproject.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -35,6 +40,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final UserRepository userRepository;
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
     private final CartItemRepository cartItemRepository;
@@ -42,43 +48,50 @@ public class OrderServiceImpl implements OrderService {
     private final OrderStatusTracker orderStatusTracker;
 
     @Override
-    public OrderCreateResponseDto createOrder(User user, OrderCreateRequestDto orderRequest) {
-        if (orderRequest.getCarts().isEmpty()) {
-            throw new IllegalArgumentException("장바구니에 상품이 존재하지 않습니다.");
+    public OrderCreateResponseDto createOrder(AuthUser auth) {
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
+        List<CartItem> cartItems = cartItemRepository.findAllByCart_User(user);
+        if (cartItems.isEmpty()) {
+            throw new InvalidRequestException("장바구니에 상품이 존재하지 않습니다.");
         }
 
-        Store store = storeRepository.findById(orderRequest.getStoreId())
-            .orElseThrow(() -> new IllegalArgumentException("Store not found"));
+        Store store = storeRepository.findById(cartItems.get(0).getMenu().getStore().getStoreId())
+            .orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
 
         LocalTime now = LocalDateTime.now().toLocalTime();
         if(now.isBefore(store.getOpenTime()) && now.isAfter(store.getCloseTime())) {
-            throw new IllegalArgumentException("주문 가능 시간이 아닙니다.");
+            throw new InvalidRequestException("주문 가능 시간이 아닙니다.");
         }
 
         int totalPrice = 0;
-        for(CartItemInfo cartItemInfo : orderRequest.getCarts()) {
-            totalPrice += cartItemInfo.getPrice();
+
+        long userCartId = user.getCart().getId();
+
+        for(CartItem cartItem : cartItems) {
+            if(cartItem.getCart().getId() != userCartId) {
+                throw new AccessDeniedException("요청한 장바구니는 현재 유저의 장바구니가 아닙니다.");
+            }
+            totalPrice += cartItem.getPrice();
+        }
+
+        if(totalPrice < 0) {
+            throw new InvalidRequestException("총 금액은 0보다 커야합니다.");
         }
 
         if(store.getOrderAmount() < totalPrice){
-            throw new IllegalArgumentException("주문 금액이 최소 주문 금액보다 낮습니다.");
+            throw new InvalidRequestException("주문 금액이 최소 주문 금액보다 낮습니다.");
         }
 
-        Order order = Order.builder()
-            .user(user)
-            .store(store)
-            .status(OrderStatus.WAITING)
-            .build();
-
+        Order order = new Order(user, store, OrderStatus.WAITING);
         order = orderRepository.save(order);
 
         // 주문 생성 후 주문 상세 테이블 생성
         List<OrderItem> orderItems = new ArrayList<>();
 
-        for (CartItemInfo cartItemInfo : orderRequest.getCarts()) {
-            Long menuId = cartItemInfo.getMenuId();
+        for (CartItem cartItemInfo : cartItems) {
+            Long menuId = cartItemInfo.getMenu().getMenu_id();
             Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new IllegalArgumentException("Menu not found"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
 
             OrderItem orderItem = new OrderItem(order, menu, cartItemInfo.getQuantity(),
                 cartItemInfo.getPrice(), cartItemInfo.getTotalPrice());
@@ -86,6 +99,9 @@ public class OrderServiceImpl implements OrderService {
         }
 
         orderItemRepository.saveAll(orderItems);
+
+        // 장바구니 목록 초기화
+        cartItemRepository.deleteAllByCart_User(user);
 
         // response dto 생성
         List<OrderItemInfo> orderItemInfos = orderItems.stream()
@@ -103,23 +119,25 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void changeOrderStatus(User user, Long storeId, Long orderId,
+    public void changeOrderStatus(AuthUser auth, Long storeId, Long orderId,
         OrderStatusChangeRequestDto requestDto) {
-        Store store = storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("Store not found"));
+        Store store = storeRepository.findById(storeId).orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
 
-//        if(store.getUser() == null || !store.getUser().equals(user)){
-//            throw new IllegalArgumentException("가게의 사장 정보가 없거나, 가게의 사장님이 아닙니다.");
-//        }
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
+
+        if(store.getUser() == null){
+            throw new InvalidRequestException("가게의 사장 정보가 없습니다.");
+        }
+
+        if(!user.equals(store.getUser())){
+            throw new AccessDeniedException("가게의 주인이 아닙니다.");
+        }
 
         Order order = orderRepository.findByIdOrElseThrow(orderId);
 
         order.updateStatus(requestDto.getOrderStatus());
         orderStatusTracker.onOrderStatusChanged(order.getId(), order.getStatus());
 
-        // 주문 수락되면 장바구니 목록 삭제
-        if(order.getStatus().equals(OrderStatus.ACCEPTED)){
-            cartItemRepository.deleteAllByCart_User(user);
-        }
 
         // 주문이 완료되면 기록 저장
         if(order.getStatus().equals(OrderStatus.COMPLETED)) {
@@ -145,7 +163,7 @@ public class OrderServiceImpl implements OrderService {
             if(!historyList.isEmpty()){
                 orderHistoryRepository.saveAll(historyList);
             }
-
+            orderItemRepository.deleteAll(items);
             orderRepository.delete(order);
         }
     }
@@ -153,13 +171,33 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public OrderStatusResponseDto getCurrentOrderStatus(User user, Long orderId) {
+    public OrderStatusResponseDto getCurrentOrderStatus(AuthUser auth, Long orderId) {
         Order order = orderRepository.findByIdOrElseThrow(orderId);
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
 
-        if(!user.equals(order.getStore().getUser()) && !user.equals(order.getUser())) {
-            throw new IllegalArgumentException("가게 사장 혹은 주문자가 아닙니다.");
+        if(auth.getRole() == Role.OWNER && !user.equals(order.getStore().getUser())) {
+            throw new AccessDeniedException("해당 가게의 사장이 아닙니다.");
+        }
+
+        if(auth.getRole() == Role.USER && !user.equals(order.getUser())) {
+            throw new AccessDeniedException("주문자가 아닙니다.");
         }
 
         return new OrderStatusResponseDto(order.getStatus());
+    }
+
+    @Override
+    public List<OrderItemInfo> getAllOrdersByStoreId(AuthUser auth, Long storeId) {
+
+        Store store = storeRepository.findStoreWithOrdersById(storeId)
+            .orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
+
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
+        if(auth.getRole() == Role.OWNER && store.getUser() != user) {
+            throw new AccessDeniedException("해당 가게의 사장이 아닙니다.");
+        }
+
+        List<OrderItem> allByOrderIn = orderItemRepository.findAllByOrderIn(store.getOrders());
+        return allByOrderIn.stream().map(OrderItemInfo::new).toList();
     }
 }

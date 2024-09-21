@@ -1,5 +1,6 @@
     package com.sparta.outsouringproject.cart.entity;
 
+    import com.sparta.outsouringproject.common.exceptions.InvalidRequestException;
     import com.sparta.outsouringproject.menu.entity.Menu;
     import jakarta.persistence.Entity;
     import jakarta.persistence.FetchType;
@@ -43,10 +44,14 @@
 
         public void updateQuantity(long quantity) {
             if(quantity < 1) {
-                throw new IllegalArgumentException("Quantity must be greater than 0");
+                throw new InvalidRequestException("수량은 0보다 커야합니다.");
             }
 
             this.quantity = quantity;
             this.totalPrice = price * quantity;
+
+            if(totalPrice < 0) {
+                throw new InvalidRequestException("총 금액은 0보다 커야합니다.");
+            }
         }
     }

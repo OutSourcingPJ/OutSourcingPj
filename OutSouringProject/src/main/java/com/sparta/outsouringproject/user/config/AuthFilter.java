@@ -30,7 +30,7 @@ public class AuthFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String url = httpServletRequest.getRequestURI();
 
-        if(StringUtils.hasText(url) && (url.startsWith("/api/user") || url.startsWith("/traker") || url.startsWith("/statistics"))) {
+        if(StringUtils.hasText(url) && (url.startsWith("/api/user") || url.startsWith("/tracker") || url.startsWith("/connect")|| url.startsWith("/statistics"))) {
             chain.doFilter(request, response);
         }else{
             String tokenValue = jwtUtil.getTokenFromRequest(httpServletRequest);
@@ -51,15 +51,15 @@ public class AuthFilter implements Filter {
                 httpServletRequest.setAttribute("role", claims.get("role"));
 
                 // 진용님이 만드신거 나중에 ArgumentResolver 사용하면 없어도 될듯
-                String email = jwtUtil.getEmailFromToken(token);
+//                String email = jwtUtil.getEmailFromToken(token);
+//
+//                User user = userRepository.findByEmail(email).orElseThrow(() ->
+//                        new NullPointerException("Not Found User")
+//                );
 
-                User user = userRepository.findByEmail(email).orElseThrow(() ->
-                        new NullPointerException("Not Found User")
-                );
 
 
-
-                request.setAttribute("email", email);
+                // request.setAttribute("email", email);
                 chain.doFilter(request, response); // 다음 Filter 로 이동
 
 

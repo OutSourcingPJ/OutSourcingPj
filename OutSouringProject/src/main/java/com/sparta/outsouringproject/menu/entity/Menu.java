@@ -48,5 +48,13 @@ public class Menu {
         this.menuName = menuName;
     }
 
-
+    /**
+     * 생성자: 정재호
+     * 생성 이유: 메뉴 Mock 데이터 만들 때 Store 지정해줘야 해서 생성
+     * @param store
+     */
+    public void relatedStore(Store store){
+        this.store = store;
+        store.getMenuList().add(this);
+    }
 }

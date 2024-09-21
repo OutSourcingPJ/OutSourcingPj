@@ -1,11 +1,15 @@
 package com.sparta.outsouringproject.order.controller;
 
+import com.sparta.outsouringproject.common.annotation.Auth;
+import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.common.dto.ResponseDto;
 import com.sparta.outsouringproject.order.dto.OrderCreateRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderCreateResponseDto;
+import com.sparta.outsouringproject.order.dto.OrderItemInfo;
 import com.sparta.outsouringproject.order.dto.OrderStatusChangeRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderStatusResponseDto;
 import com.sparta.outsouringproject.order.service.OrderService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,19 +35,19 @@ public class OrderController {
      */
     @PostMapping("/orders")
     public ResponseEntity<ResponseDto<OrderCreateResponseDto>> requestOrder(
-        @RequestBody OrderCreateRequestDto orderRequest) {
+        @Auth AuthUser authUser) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ResponseDto.of(HttpStatus.CREATED, orderService.createOrder(null, orderRequest)));
+            .body(ResponseDto.of(HttpStatus.CREATED, orderService.createOrder(authUser)));
     }
 
     /**
      * 주문 상태 변경
      */
     @PatchMapping("/stores/{storeId}/orders/{orderId}/status")
-    public ResponseEntity<ResponseDto<Void>> acceptOrder(@PathVariable("storeId") Long storeId,
+    public ResponseEntity<ResponseDto<Void>> acceptOrder(@Auth AuthUser authUser, @PathVariable("storeId") Long storeId,
         @PathVariable("orderId") Long orderId, @RequestBody OrderStatusChangeRequestDto requestDto) {
-        orderService.changeOrderStatus(null, storeId, orderId, requestDto);
+        orderService.changeOrderStatus(authUser, storeId, orderId, requestDto);
         return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, "정상적으로 변경되었습니다."));
     }
 
@@ -53,8 +57,20 @@ public class OrderController {
      */
     @GetMapping("orders/{orderId}")
     public ResponseEntity<ResponseDto<OrderStatusResponseDto>> currentOrderStatus(
+        @Auth AuthUser authUser,
         @PathVariable("orderId") Long orderId) {
         return ResponseEntity.ok(
-            ResponseDto.of(HttpStatus.OK, orderService.getCurrentOrderStatus(null, orderId)));
+            ResponseDto.of(HttpStatus.OK, orderService.getCurrentOrderStatus(authUser, orderId)));
+    }
+
+    /**
+     * 현재 가게의 주문요청 리스트
+     */
+    @GetMapping("/stores/{storeId}/orders")
+    public ResponseEntity<ResponseDto<List<OrderItemInfo>>> getAllOrders(
+        @Auth AuthUser authUser, @PathVariable Long storeId
+    ){
+        return ResponseEntity.ok(
+            ResponseDto.of(HttpStatus.OK, orderService.getAllOrdersByStoreId(authUser, storeId)));
     }
 }
