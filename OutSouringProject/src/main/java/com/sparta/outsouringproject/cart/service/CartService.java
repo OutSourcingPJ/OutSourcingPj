@@ -4,28 +4,28 @@ import com.sparta.outsouringproject.cart.dto.AddMenuRequestDto;
 import com.sparta.outsouringproject.cart.dto.CartItemInfo;
 import com.sparta.outsouringproject.cart.dto.CartItemListInfo;
 import com.sparta.outsouringproject.cart.dto.CartItemUpdateRequestDto;
+import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.user.entity.User;
-import java.util.List;
 
 public interface CartService {
     /**
      * 장바구니에 물품 추가
      *
-     * @param user
+     * @param auth
      * @param requestDto
      * @return
      */
-    CartItemInfo addMenu(User user, AddMenuRequestDto requestDto);
+    CartItemInfo addMenu(AuthUser auth, AddMenuRequestDto requestDto);
 
     /**
      * 장바구니에 해당 아이디 물품 수량 변경
      *
-     * @param user
+     * @param auth
      * @param cartItemId
      * @param requestDto
      * @return
      */
-    CartItemInfo updateQuantity(User user, Long cartItemId,
+    CartItemInfo updateQuantity(AuthUser auth, Long cartItemId,
         CartItemUpdateRequestDto requestDto);
 
     /**
@@ -34,26 +34,26 @@ public interface CartService {
      * @param cartItemId
      * @return
      */
-    CartItemInfo getCartItem(User user, Long cartItemId);
+    CartItemInfo getCartItem(AuthUser user, Long cartItemId);
 
     /**
      * 유저의 장바구니에 들어있는 물품 전체 조회
-     * @param user
+     * @param auth
      * @return
      */
-    CartItemListInfo getCartItems(User user);
+    CartItemListInfo getCartItems(AuthUser auth);
 
     /**
      * 장바구니에 해당 아이디의 물품 삭제
      *
-     * @param user
+     * @param auth
      * @param itemId
      */
-    void deleteItem(User user, Long itemId);
+    void deleteItem(AuthUser auth, Long itemId);
 
     /**
      * 장바구니에 있는 모든 물품 삭제
-     * @param user
+     * @param auth
      */
-    void deleteAllItems(User user);
+    void deleteAllItems(AuthUser auth);
 }

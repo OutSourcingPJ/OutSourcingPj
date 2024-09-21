@@ -45,15 +45,24 @@ public class Order extends Timestamped {
     @OneToMany(mappedBy = "order")
     private List<OrderItem> items = new ArrayList<>();
 
-    @Builder
     public Order(User user, Store store, OrderStatus status) {
-        this.user = user;
-        this.store = store;
+        relatedUesr(user);
+        relatedStore(store);
         this.status = status;
     }
 
     public void updateStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public void relatedUesr(User user) {
+        this.user = user;
+        user.getOrders().add(this);
+    }
+
+    public void relatedStore(Store store) {
+        this.store = store;
+        store.getOrders().add(this);
     }
 
 }

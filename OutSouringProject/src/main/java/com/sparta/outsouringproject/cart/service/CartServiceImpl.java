@@ -8,11 +8,17 @@ import com.sparta.outsouringproject.cart.entity.Cart;
 import com.sparta.outsouringproject.cart.entity.CartItem;
 import com.sparta.outsouringproject.cart.repository.CartItemRepository;
 import com.sparta.outsouringproject.cart.repository.CartRepository;
+import com.sparta.outsouringproject.common.annotation.Auth;
+import com.sparta.outsouringproject.common.dto.AuthUser;
+import com.sparta.outsouringproject.common.exceptions.AccessDeniedException;
+import com.sparta.outsouringproject.common.exceptions.InvalidRequestException;
 import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.menu.repository.MenuRepository;
 import com.sparta.outsouringproject.store.entity.Store;
 import com.sparta.outsouringproject.store.repository.StoreRepository;
 import com.sparta.outsouringproject.user.entity.User;
+import com.sparta.outsouringproject.user.repository.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +32,27 @@ public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final UserRepository userRepository;
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
 
     @Override
-    public CartItemInfo addMenu(User user, AddMenuRequestDto requestDto) {
+    public CartItemInfo addMenu(AuthUser auth, AddMenuRequestDto requestDto) {
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
+
         Store store = storeRepository.findById(requestDto.getStoreId())
-            .orElseThrow(() -> new IllegalArgumentException("Store not found"));
+            .orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
 
         Menu menu = menuRepository.findById(requestDto.getMenuId())
-            .orElseThrow(() -> new IllegalArgumentException("Menu not found"));
+            .orElseThrow(() -> new InvalidRequestException("존재하지 않는 메뉴입니다."));
 
         Cart cart = cartRepository.findByUser(user)
-            .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
+            .orElseThrow(() -> new InvalidRequestException("존재하지 않는 장바구니입니다."));
+
+        // 카트의 주인 유저가 아니면 throw
+        if(cart.getUser() != user) {
+            throw new AccessDeniedException("요청한 장바구니의 소유자가 아닙니다.");
+        }
 
         // 장바구니에 물품이 있을 때
         if(!cart.getCartItems().isEmpty()){
@@ -50,7 +64,7 @@ public class CartServiceImpl implements CartService {
 
             // 가게 아이디가 다르면 현재 물품은 전부 삭제
             if(!Objects.equals(storeId, requestDto.getStoreId())){
-                deleteAllItems(user);
+                cartItemRepository.deleteAllByCart_User(user);
             }
         }
 
@@ -59,6 +73,7 @@ public class CartServiceImpl implements CartService {
         CartItem cartItem = new CartItem(1L, menuPrice, cart, menu);
         cartItem = cartItemRepository.save(cartItem);
         return CartItemInfo.builder()
+            .cartId(cart.getId())
             .cartItemId(cartItem.getId())
             .price(menuPrice)
             .menuId(menu.getMenu_id())
@@ -69,9 +84,16 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartItemInfo updateQuantity(User user, Long cartItemId,
+    public CartItemInfo updateQuantity(AuthUser auth, Long cartItemId,
         CartItemUpdateRequestDto requestDto) {
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
+
         CartItem cartItem = cartItemRepository.findCartItemByIdOrElseThrow(cartItemId);
+        Cart cart = cartItem.getCart();
+
+        if(cart != user.getCart()){
+            throw new AccessDeniedException("요청한 장바구니의 소유자가 아닙니다.");
+        }
 
         Menu menu = cartItem.getMenu();
         Long menuId = menu.getMenu_id();
@@ -79,6 +101,7 @@ public class CartServiceImpl implements CartService {
 
         cartItem.updateQuantity(requestDto.getQuantity());
         return CartItemInfo.builder()
+            .cartId(cart.getId())
             .cartItemId(cartItem.getId())
             .price(cartItem.getPrice())
             .menuId(menuId)
@@ -89,13 +112,23 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartItemInfo getCartItem(User user, Long cartItemId) {
+    public CartItemInfo getCartItem(AuthUser auth, Long cartItemId) {
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
+
         CartItem cartItem = cartItemRepository.findCartItemByIdOrElseThrow(cartItemId);
+
+        // 아이템들이 담긴 카트와 로그인 유저의 카트가 다르면 throw
+        Cart cart = cartItem.getCart();
+        if(cart != user.getCart()){
+            throw new AccessDeniedException("요청한 장바구니의 소유자가 아닙니다.");
+        }
+
         Menu menu = cartItem.getMenu();
         Long menuId = menu.getMenu_id();
         String menuName = menu.getMenuName();
 
         return CartItemInfo.builder()
+            .cartId(cart.getId())
             .cartItemId(cartItem.getId())
             .price(cartItem.getPrice())
             .menuId(menuId)
@@ -106,18 +139,29 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartItemListInfo getCartItems(User user) {
+    public CartItemListInfo getCartItems(AuthUser auth) {
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
+
         List<CartItem> res = cartItemRepository.findAllByCart_User(user);
-        List<CartItemInfo> list = res.stream()
-            .map(x -> CartItemInfo.builder()
-                .cartItemId(x.getId())
-                .price(x.getPrice())
-                .menuId(x.getMenu().getMenu_id())
-                .menuName(x.getMenu().getMenuName())
-                .quantity(x.getQuantity())
-                .totalPrice(x.getTotalPrice())
-                .build())
-            .toList();
+        List<CartItemInfo> list = new ArrayList<>();
+
+        for(CartItem item : res ) {
+            Cart cart = item.getCart();
+            Menu menu = item.getMenu();
+            if(cart != user.getCart()) {
+                throw new AccessDeniedException("요청한 장바구니의 소유자가 아닙니다.");
+            }
+
+            list.add(CartItemInfo.builder()
+                .cartId(cart.getId())
+                .cartItemId(item.getId())
+                .price(item.getPrice())
+                .menuId(menu.getMenu_id())
+                .menuName(menu.getMenuName())
+                .quantity(item.getQuantity())
+                .totalPrice(item.getTotalPrice())
+                .build());
+        }
 
         long totalPrice = 0;
         for (CartItemInfo cartItemInfo : list) {
@@ -128,13 +172,22 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void deleteItem(User user, Long itemId) {
+    public void deleteItem(AuthUser auth, Long itemId) {
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
+
         CartItem cartItem = cartItemRepository.findCartItemByIdOrElseThrow(itemId);
+
+        if (cartItem.getCart() != user.getCart()) {
+            throw new AccessDeniedException("요청한 장바구니의 소유자가 아닙니다.");
+        }
+
         cartItemRepository.delete(cartItem);
     }
 
     @Override
-    public void deleteAllItems(User user) {
+    public void deleteAllItems(AuthUser auth) {
+        User user = userRepository.findByIdOrElseThrow(auth.getId());
+
         cartItemRepository.deleteAllByCart_User(user);
     }
 }

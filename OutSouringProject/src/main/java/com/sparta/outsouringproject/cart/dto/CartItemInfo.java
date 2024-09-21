@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CartItemInfo {
 
+    private Long cartId;
     private Long cartItemId;
     private Long menuId;
     private String menuName;
@@ -17,7 +18,8 @@ public class CartItemInfo {
     private Long totalPrice;
 
     @Builder
-    public CartItemInfo(Long cartItemId, Long menuId, Long quantity, Long price, Long totalPrice, String menuName) {
+    public CartItemInfo(Long cartId, Long cartItemId, Long menuId, Long quantity, Long price, Long totalPrice, String menuName) {
+        this.cartId = cartId;
         this.cartItemId = cartItemId;
         this.menuId = menuId;
         this.quantity = quantity;
