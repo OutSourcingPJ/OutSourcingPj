@@ -10,6 +10,7 @@ import com.sparta.outsouringproject.review.entity.OwnerReview;
 import com.sparta.outsouringproject.review.entity.Review;
 import com.sparta.outsouringproject.review.repository.OwnerReviewRepository;
 import com.sparta.outsouringproject.review.repository.ReviewRepository;
+import com.sparta.outsouringproject.user.entity.Role;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,26 +40,27 @@ public class ReviewServiceImpl implements ReviewService {
     private final UserRepository userRepository;
     private final OwnerReviewRepository ownerReviewRepository;
 
-    @Value("$(file.upload_dir)")
+    @Value("${file.upload_dir}")
     private String uploadDir;
 
     @Override
     @Transactional
-    public ReviewResponseDto createReview(Long menuId, ReviewRequestDto reviewRequestDto, String email, MultipartFile multipartFile) throws IOException {
+    public ReviewResponseDto createReview(Long menuId, ReviewRequestDto reviewRequestDto, String email, MultipartFile reviewImage) throws IOException {
 
         //게시물 생성
         Menu menu = menuRepository.findById(menuId).orElseThrow(()-> new IllegalArgumentException("메뉴를 찾을 수 없습니다."));
         User user = userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("작성 권한이 없습니다."));
+
         String imagePath = null;
-        if (multipartFile != null && !multipartFile.isEmpty()) {
-            imagePath = saveImage(multipartFile, email);
+        if (reviewImage != null && !reviewImage.isEmpty()) {
+            imagePath = saveReviewImage(reviewImage, email);
         }
 
         //게시물, 이미지 한번에 처리
         Review savedReview = Review.builder()
                 .menu(menu)
                 .user(user)
-                .contents(reviewRequestDto.getContents())
+                .contents(reviewRequestDto)
                 .image(imagePath)
                 .build();
 
@@ -70,18 +72,29 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public List<ReviewResponseDto> getReview(Long menuId, Pageable pageable) {
         menuRepository.findById(menuId).orElseThrow(()-> new IllegalArgumentException("메뉴를 찾을 수 없습니다."));
-        Page<Review> review = reviewRepository.findByMenuIdOrderByIdDesc(menuId, pageable);
+        Page<Review> review = reviewRepository.findByMenuIdWithOwnerReview(menuId, pageable);
         return review.getContent().stream().map(ReviewResponseDto::new).toList();
     }
 
     @Override
     @Transactional
-    public ReviewResponseDto upateReview(Long reviewId, String email, ReviewRequestDto reviewRequestDto) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+    public ReviewResponseDto updateReview(Long reviewId, String email, ReviewRequestDto reviewRequestDto, MultipartFile reviewImage) throws IOException {
+        Review updateReview = reviewRepository.findById(reviewId).orElseThrow(()-> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
         User user = userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("수정 권한이 없습니다."));
-        review.update(review, user, reviewRequestDto);
-        return new ReviewResponseDto(review);
+
+//        String newReviewImagePath = null;
+//        if (reviewImage != null && !reviewImage.isEmpty()) {
+//            deleteExistingReviewImage(updateReview);
+//            newReviewImagePath = saveReviewImage(reviewImage, user.getEmail());
+//        }
+
+        updateReview.update(user, reviewRequestDto);
+//        reviewRepository.save(updateReview);
+
+        return new ReviewResponseDto(updateReview);
     }
+
+
 
     @Override
     public ReviewResponseDto deleteReview(Long reviewId, String email) {
@@ -95,12 +108,15 @@ public class ReviewServiceImpl implements ReviewService {
     public OwnerReviewResponseDto createOwnerComment(Long reviewId, OwnerReviewRequestDto reviewRequestDto, String email) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
         User user = userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("작성 권한이 없습니다.")); // 이넘 활용하여 수정할것
+        if(user.getRole() != Role.OWNER) {
+            throw new IllegalArgumentException("작성 권한이 없습니다.");
+        }
         OwnerReview savedReview = new OwnerReview(review, user, reviewRequestDto);
         ownerReviewRepository.save(savedReview);
         return new OwnerReviewResponseDto(savedReview);
     }
 
-    private String saveImage(MultipartFile multipartFile, String email) throws IOException {
+    private String saveReviewImage(MultipartFile reviewImage, String email) throws IOException {
         String userDir = uploadDir + "/" + email;
         Path userPath = Paths.get(userDir);
 
@@ -108,13 +124,23 @@ public class ReviewServiceImpl implements ReviewService {
             Files.createDirectories(userPath);
         }
 
-        String fileName = UUID.randomUUID() + "_" + StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        String fileName = UUID.randomUUID() + "_" + StringUtils.cleanPath(Objects.requireNonNull(reviewImage.getOriginalFilename()));
         Path targetLocation = userPath.resolve(fileName);
 
-        Files.copy(multipartFile.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(reviewImage.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
         return targetLocation.toString();
     }
 
-
+//    private void deleteExistingReviewImage(Review review) {
+//        String existingReviewImage = review.getImage();
+//        if (existingReviewImage != null && !existingReviewImage.isEmpty()) {
+//            try {
+//                Path fileToDeletePath = Paths.get(existingReviewImage);
+//                Files.deleteIfExists(fileToDeletePath);
+//            } catch (IOException e) {
+//                System.err.println("리뷰 이미지 삭제 중 오류 발생: " + e.getMessage());
+//            }
+//        }
+//    }
 }

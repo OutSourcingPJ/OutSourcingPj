@@ -11,6 +11,6 @@ import java.util.List;
 public interface ReviewService {
     public ReviewResponseDto createReview(Long menuId, ReviewRequestDto reviewRequestDto, String email, MultipartFile multipartFile)throws IOException;
     public List<ReviewResponseDto> getReview(Long menuId, Pageable pageable);
-    public ReviewResponseDto upateReview(Long reviewId, String email, ReviewRequestDto reviewRequestDto);
+    public ReviewResponseDto updateReview(Long reviewId, String email, ReviewRequestDto reviewRequestDto, MultipartFile reviewImage)throws IOException;
     public ReviewResponseDto deleteReview(Long reviewId, String email);
 }

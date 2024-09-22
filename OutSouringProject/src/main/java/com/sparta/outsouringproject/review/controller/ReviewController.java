@@ -31,25 +31,27 @@ public class ReviewController {
                                                   @Valid @ModelAttribute ReviewRequestDto reviewRequestDto,
                                                   HttpServletRequest request,
                                                   @RequestParam(value = "reviewImage", required = false)
-                                                  MultipartFile multipartFile) throws IOException {
+                                                  MultipartFile reviewImage) throws IOException {
         String email = (String) request.getAttribute("email");
-        return ResponseEntity.ok(reviewService.createReview(menuId, reviewRequestDto, email, multipartFile));
+        return ResponseEntity.ok(reviewService.createReview(menuId, reviewRequestDto, email, reviewImage));
     }
 
     @GetMapping("/{menuId}")
     ResponseEntity<List<ReviewResponseDto>> getReviews(@PathVariable Long menuId,
                                                        @RequestParam(defaultValue = "1") int page,
                                                        @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "id"));
         return ResponseEntity.ok(reviewService.getReview(menuId, pageable));
     }
 
     @PutMapping("/{reviewId}")
     ResponseEntity<ReviewResponseDto> updateReview(@PathVariable Long reviewId,
                                                    @Valid @ModelAttribute ReviewRequestDto reviewRequestDto,
-                                                   HttpServletRequest request) {
+                                                   @RequestParam(value = "reviewImage", required = false)
+                                                           MultipartFile reviewImage,
+                                                   HttpServletRequest request) throws IOException{
         String email = (String) request.getAttribute("email");
-        return ResponseEntity.ok(reviewService.upateReview(reviewId, email, reviewRequestDto));
+        return ResponseEntity.ok(reviewService.updateReview(reviewId, email, reviewRequestDto, reviewImage));
     }
 
     @DeleteMapping("/{reviewId}")
@@ -59,7 +61,7 @@ public class ReviewController {
     }
 
     // 오너
-    @PostMapping("/{reviewId}")
+    @PostMapping("/ownerComment/{reviewId}")
     ResponseEntity<OwnerReviewResponseDto> createOwnerComment(@PathVariable Long reviewId,
                                                               @RequestBody OwnerReviewRequestDto reviewRequestDto,
                                                               HttpServletRequest request) {

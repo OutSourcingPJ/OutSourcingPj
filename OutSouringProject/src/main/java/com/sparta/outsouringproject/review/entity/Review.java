@@ -5,10 +5,7 @@ import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.review.dto.request.ReviewRequestDto;
 import com.sparta.outsouringproject.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +14,6 @@ import java.util.List;
 @Getter
 @Table(name = "review")
 @NoArgsConstructor
-@Data
 public class Review extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +34,6 @@ public class Review extends Timestamped {
 
 
     public Review(Menu menu, User user, ReviewRequestDto reviewRequestDto) {
-        this.id = reviewRequestDto.getId();
         this.contents = reviewRequestDto.getContents();
         this.menu = menu;
         this.user = user;
@@ -46,17 +41,21 @@ public class Review extends Timestamped {
     }
 
     @Builder
-    public Review(Menu menu, User user, String contents, String image) {
-        this.contents = contents;
+    public Review(Menu menu, User user, ReviewRequestDto contents, String image) {
+        this.contents = contents.getContents();
         this.image = image;
         this.user = user;
         this.menu = menu;
 
     }
 
-    public void update(Review review, User user, ReviewRequestDto reviewRequestDto) {
-    this.id = review.getId();
+    public void update(User user, ReviewRequestDto reviewRequestDto) {
     this.contents = reviewRequestDto.getContents();
     this.user = user;
+    }
+
+    public void update(ReviewRequestDto reviewRequestDto, String newReviewImagePath) {
+        this.contents = reviewRequestDto.getContents();
+        this.image = newReviewImagePath;
     }
 }
