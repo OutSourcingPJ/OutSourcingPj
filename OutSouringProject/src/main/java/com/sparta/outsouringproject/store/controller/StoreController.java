@@ -1,5 +1,7 @@
 package com.sparta.outsouringproject.store.controller;
 
+import com.sparta.outsouringproject.common.annotation.Auth;
+import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.common.dto.ResponseDto;
 import com.sparta.outsouringproject.menu.dto.MenuResponseDto;
 import com.sparta.outsouringproject.menu.service.MenuService;
@@ -26,9 +28,8 @@ public class StoreController {
      * @return StoreResponseDto
      */
     @PostMapping
-    public ResponseEntity<ResponseDto<StoreResponseDto>> saveStore(@RequestBody CreateStoreRequestDto requestDto, HttpServletRequest request) {
-        String email = (String) request.getAttribute("email");
-        StoreResponseDto responseDto = storeService.saveStore(requestDto, email);
+    public ResponseEntity<ResponseDto<StoreResponseDto>> saveStore(@RequestBody CreateStoreRequestDto requestDto, @Auth AuthUser authUser) {
+        StoreResponseDto responseDto = storeService.saveStore(requestDto, authUser);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ResponseDto.of(HttpStatus.CREATED, "가게가 추가되었습니다.", responseDto));
     }
@@ -68,8 +69,8 @@ public class StoreController {
      * @return StoreResponseDto
      */
     @PatchMapping("/{storeId}")
-    public ResponseEntity<ResponseDto<StoreResponseDto>> modify(@PathVariable("storeId") Long storeId, @RequestBody ModifyStoreRequestDto requestDto) {
-        StoreResponseDto responseDto = storeService.modify(storeId, requestDto);
+    public ResponseEntity<ResponseDto<StoreResponseDto>> modify(@PathVariable("storeId") Long storeId, @RequestBody ModifyStoreRequestDto requestDto, @Auth AuthUser authUser) {
+        StoreResponseDto responseDto = storeService.modify(storeId, requestDto, authUser);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseDto.of(200, "가게 정보가 수정되었습니다.", responseDto));
     }
@@ -80,8 +81,8 @@ public class StoreController {
      * @return message
      */
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<ResponseDto<String>> deleteStore(@PathVariable("storeId") Long storeId) {
-        storeService.delete(storeId);
+    public ResponseEntity<ResponseDto<String>> deleteStore(@PathVariable("storeId") Long storeId, @Auth AuthUser authUser) {
+        storeService.delete(storeId, authUser);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseDto.of(200, "성공적으로 삭제되었습니다."));
     }
@@ -99,8 +100,8 @@ public class StoreController {
      * @return message
      */
     @PatchMapping("/advertise/{storeId}")
-    public ResponseEntity<ResponseDto<String>> checkAdvertise(@PathVariable("storeId") Long storeId) {
-        storeService.checkAdvertise(storeId);
+    public ResponseEntity<ResponseDto<String>> checkAdvertise(@PathVariable("storeId") Long storeId, @Auth AuthUser authUser) {
+        storeService.checkAdvertise(storeId, authUser);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseDto.of(200, "해당 업체가 광고로 선정되었습니다."));
     }
@@ -111,8 +112,8 @@ public class StoreController {
      * @return message
      */
     @PatchMapping("/unAdvertise/{storeId}")
-    public ResponseEntity<ResponseDto<String>> unCheckAdvertise(@PathVariable("storeId") Long storeId) {
-        storeService.unCheckAdvertise(storeId);
+    public ResponseEntity<ResponseDto<String>> unCheckAdvertise(@PathVariable("storeId") Long storeId, @Auth AuthUser authUser) {
+        storeService.unCheckAdvertise(storeId, authUser);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseDto.of(200, "해당 업체가 광고에서 해제되었습니다."));
     }

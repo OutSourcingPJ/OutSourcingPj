@@ -29,6 +29,8 @@ public class Store {
     private LocalTime openTime;
     @Column(length = 50)
     private LocalTime closeTime;
+    @Column(length = 100)
+    private String notice;
     private Boolean storeStatus;
     private Boolean advertise;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -65,6 +67,7 @@ public class Store {
     public void deleteStore() {
         this.storeStatus = true;
     }
+    public void changeNotice(String notice) { this.notice = notice; }
     public void checkAdvertise() {
         this.advertise = true;
     }

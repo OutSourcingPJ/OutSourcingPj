@@ -3,6 +3,7 @@ package com.sparta.outsouringproject.user.entity;
 //import com.sparta.outsouringproject.cart.entity.Cart;
 
 import com.sparta.outsouringproject.cart.entity.Cart;
+import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.order.entity.Order;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -54,5 +55,16 @@ public class User {
         this.signupTime = LocalDateTime.now();
         this.role = role;
         this.isDeleted = isDeleted;
+    }
+
+    // 테스트를 하기 위함
+    private User(Long id, String email, Role role) {
+        this.id = id;
+        this.email = email;
+        this.role = role;
+    }
+
+    public static User fromAuthUser(AuthUser authUser) {
+        return new User(authUser.getId(), authUser.getEmail(), authUser.getRole());
     }
 }
