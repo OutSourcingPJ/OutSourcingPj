@@ -16,4 +16,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
         "JOIN FETCH oi.menu m " +
         "WHERE oi.order = :order")
     List<OrderItem> findAllByOrder(@Param("order") Order order);
+
+    @Query("SELECT oi FROM OrderItem oi JOIN FETCH  oi.order WHERE oi.order IN :order ORDER BY  oi.order.id")
+    List<OrderItem> findAllByOrderIn(List<Order> order);
 }

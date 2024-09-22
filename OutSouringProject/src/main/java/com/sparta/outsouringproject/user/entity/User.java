@@ -7,13 +7,16 @@ import com.sparta.outsouringproject.order.entity.Order;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "users")
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -43,4 +46,13 @@ public class User {
 
     @Column
     private boolean isDeleted = false; // 탈퇴 여부
+
+    public User(String password, String username, String email, Role role, boolean isDeleted) {
+        this.password = password;
+        this.username = username;
+        this.email = email;
+        this.signupTime = LocalDateTime.now();
+        this.role = role;
+        this.isDeleted = isDeleted;
+    }
 }

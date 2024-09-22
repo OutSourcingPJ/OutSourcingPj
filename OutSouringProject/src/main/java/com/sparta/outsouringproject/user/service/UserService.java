@@ -5,6 +5,7 @@ import com.sparta.outsouringproject.cart.repository.CartItemRepository;
 import com.sparta.outsouringproject.cart.repository.CartRepository;
 import com.sparta.outsouringproject.user.config.JwtUtil;
 import com.sparta.outsouringproject.user.config.PasswordEncoder;
+import com.sparta.outsouringproject.user.dto.LoginRequestDto;
 import com.sparta.outsouringproject.user.entity.Role;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
@@ -45,8 +46,7 @@ public class UserService {
         user = userRepository.save(user);
 
         // 카트도 함께 생성
-        Cart cart = new Cart();
-        cart.relatedUser(user);
+        Cart cart = new Cart(user);
         cartRepository.save(cart);
     }
 
@@ -70,11 +70,11 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String login(String email, String password, HttpServletResponse response) {
-        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+    public String login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(loginRequestDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
         String token = jwtUtil.createToken(user.getId(), user.getEmail(), user.getRole());

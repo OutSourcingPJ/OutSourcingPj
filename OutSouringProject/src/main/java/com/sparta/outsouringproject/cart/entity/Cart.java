@@ -14,9 +14,11 @@ import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Cart extends Timestamped {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +31,8 @@ public class Cart extends Timestamped {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
 
-    public void relatedUser(User user) {
+    public Cart(User user) {
         this.user = user;
+        user.setCart(this);
     }
 }

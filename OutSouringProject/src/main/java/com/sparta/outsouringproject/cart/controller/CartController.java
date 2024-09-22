@@ -5,6 +5,8 @@ import com.sparta.outsouringproject.cart.dto.CartItemInfo;
 import com.sparta.outsouringproject.cart.dto.CartItemListInfo;
 import com.sparta.outsouringproject.cart.dto.CartItemUpdateRequestDto;
 import com.sparta.outsouringproject.cart.service.CartService;
+import com.sparta.outsouringproject.common.annotation.Auth;
+import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.common.dto.ResponseDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +32,9 @@ public class CartController {
      * 장바구니에 물품 추가
      */
     @PostMapping("/items")
-    public ResponseEntity<ResponseDto<CartItemInfo>> addItem(@RequestBody AddMenuRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<CartItemInfo>> addItem(@Auth AuthUser authUser, @RequestBody AddMenuRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ResponseDto.of(HttpStatus.CREATED, cartService.addMenu(null, requestDto)));
+            .body(ResponseDto.of(HttpStatus.CREATED, cartService.addMenu(authUser, requestDto)));
     }
 
     /**
@@ -42,9 +44,9 @@ public class CartController {
      * @return
      */
     @PatchMapping("/items/{itemId}")
-    public ResponseEntity<ResponseDto<CartItemInfo>> updateItem(@PathVariable("itemId") Long itemId,
+    public ResponseEntity<ResponseDto<CartItemInfo>> updateItem(@Auth AuthUser authUser, @PathVariable("itemId") Long itemId,
         @RequestBody CartItemUpdateRequestDto request){
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.of(HttpStatus.OK, cartService.updateQuantity(null, itemId, request)));
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.of(HttpStatus.OK, cartService.updateQuantity(authUser, itemId, request)));
     }
 
     /**
@@ -52,8 +54,8 @@ public class CartController {
      * @return
      */
     @GetMapping("/items/{itemId}")
-    public ResponseEntity<ResponseDto<CartItemInfo>> getItem(@PathVariable("itemId") Long itemId) {
-        return ResponseEntity.ok().body(ResponseDto.of(HttpStatus.OK,cartService.getCartItem(null, itemId)));
+    public ResponseEntity<ResponseDto<CartItemInfo>> getItem(@Auth AuthUser authUser, @PathVariable("itemId") Long itemId) {
+        return ResponseEntity.ok().body(ResponseDto.of(HttpStatus.OK,cartService.getCartItem(authUser, itemId)));
     }
 
     /**
@@ -61,16 +63,16 @@ public class CartController {
      * @return
      */
     @GetMapping("/items")
-    public ResponseEntity<ResponseDto<CartItemListInfo>> getAllItems() {
-        return ResponseEntity.ok().body(ResponseDto.of(HttpStatus.OK, cartService.getCartItems(null)));
+    public ResponseEntity<ResponseDto<CartItemListInfo>> getAllItems(@Auth AuthUser authUser) {
+        return ResponseEntity.ok().body(ResponseDto.of(HttpStatus.OK, cartService.getCartItems(authUser)));
     }
 
     /**
      * 장바구니에 있는 물품 삭제
      */
     @DeleteMapping("/items/{itemId}")
-    public ResponseEntity<ResponseDto<Void>> deleteItem(@PathVariable("itemId") Long itemId) {
-        cartService.deleteItem(null, itemId);
+    public ResponseEntity<ResponseDto<Void>> deleteItem(@Auth AuthUser authUser, @PathVariable("itemId") Long itemId) {
+        cartService.deleteItem(authUser, itemId);
         return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, "정상적으로 삭제되었습니다."));
     }
 
@@ -78,8 +80,8 @@ public class CartController {
      * 장바구니에 있는 물품 전체 삭제
      */
     @DeleteMapping("/items")
-    public ResponseEntity<ResponseDto<Void>> deleteAllItems() {
-        cartService.deleteAllItems(null);
+    public ResponseEntity<ResponseDto<Void>> deleteAllItems(@Auth AuthUser authUser) {
+        cartService.deleteAllItems(authUser);
         return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, "정상적으로 삭제되었습니다."));
     }
 }
