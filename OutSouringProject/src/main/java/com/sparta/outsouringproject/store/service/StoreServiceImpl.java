@@ -1,5 +1,10 @@
 package com.sparta.outsouringproject.store.service;
 
+
+import com.sparta.outsouringproject.common.dto.AuthUser;
+import com.sparta.outsouringproject.common.exceptions.AccessDeniedException;
+import com.sparta.outsouringproject.common.exceptions.InvalidRequestException;
+import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.store.dto.*;
 import com.sparta.outsouringproject.store.entity.Store;
 import com.sparta.outsouringproject.store.repository.StoreRepository;
@@ -24,21 +29,20 @@ public class StoreServiceImpl implements StoreService{
     // 가게 저장
     @Transactional
     @Override
-    public StoreResponseDto saveStore(CreateStoreRequestDto requestDto, String email) {
+    public StoreResponseDto saveStore(CreateStoreRequestDto requestDto, AuthUser authUser) {
         log.info("::: 가게 저장 로직 동작 :::");
 
-        User user = userRepository.findByEmailAndIsDeletedFalse(email)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다!"));
+        User user = userRepository.findByEmailAndIsDeletedFalse(authUser.getEmail())
+                .orElseThrow(() -> new InvalidRequestException("해당 회원을 찾을 수 없습니다!"));
 
         log.info("::: 회원 검사 로직 동작 :::");
-        // 회원파트 생성되면 적용 + delte값 설정되어있을테니 findById에서 JPQL로 수정
         if(user.getRole() != Role.OWNER) {
-            throw new IllegalArgumentException("해당 회원은 가게 등록 권한이 없습니다!");
+            throw new AccessDeniedException("해당 회원은 가게 등록 권한이 없습니다!");
         }
         log.info("::: 가게 갯수 확인 :::");
         Long storeCount = storeRepository.countActiveStoresByUser(user);
         if(storeCount >= 3) {
-            throw new IllegalArgumentException("가게는 총 3개만 만들 수 있습니다!");
+            throw new InvalidRequestException("가게는 총 3개만 만들 수 있습니다!");
         }
 
         Store store = new Store(requestDto, user);
@@ -54,7 +58,7 @@ public class StoreServiceImpl implements StoreService{
     public GetStoreResponseDto getStore(Long storeId) {
         log.info("::: 가게 단건 조회 :::");
         Store store = storeRepository.checkStore(storeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
+                .orElseThrow(() -> new InvalidRequestException("해당 가게가 없습니다!"));
         return new GetStoreResponseDto(store);
     }
 
@@ -65,7 +69,7 @@ public class StoreServiceImpl implements StoreService{
         log.info("::: 가게 전체 조회 :::");
         List<Store> stores = storeRepository.findAllActiveStores();
         if (stores.isEmpty()) {
-            throw new IllegalArgumentException("등록된 가게가 존재하지 않습니다.");
+            throw new InvalidRequestException("등록된 가게가 존재하지 않습니다.");
         }
         List<StoreResponseDto> storeDtoList = stores.stream()
                 .map(StoreResponseDto::new)
@@ -81,7 +85,7 @@ public class StoreServiceImpl implements StoreService{
         log.info("::: 특정 가게 조회 :::");
         List<Store> stores = storeRepository.findStoresByName(name);
         if (stores.isEmpty()) {
-            throw new IllegalArgumentException("해당 이름을 가진 가게가 존재하지 않습니다.");
+            throw new InvalidRequestException("해당 이름을 가진 가게가 존재하지 않습니다.");
         }
         List<StoreResponseDto> storeDtoList = stores.stream()
                 .map(StoreResponseDto::new)
@@ -93,15 +97,14 @@ public class StoreServiceImpl implements StoreService{
     // 가게 수정
     @Transactional
     @Override
-    public StoreResponseDto modify(Long storeId, ModifyStoreRequestDto requestDto) {
+    public StoreResponseDto modify(Long storeId, ModifyStoreRequestDto requestDto, AuthUser authUser) {
         log.info("::: 가게 수정 로직 동작 :::");
         Store store = storeRepository.checkStore(storeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
+                .orElseThrow(() -> new InvalidRequestException("해당 가게가 없습니다!"));
         // 권한 체크 코드
-//        if(!store.getUser().getUserId().equals(ArgumentResolver에서 반환된 userId값)) {
-//            throw new IllegalArgumentException("수정 권한이 없습니다!");
-//        }
-
+        if(!store.getUser().getId().equals(authUser.getId())) {
+            throw new AccessDeniedException("수정 권한이 없습니다!");
+        }
         if(requestDto.getName() != null) {
             store.changeName(requestDto.getName());
         }
@@ -114,6 +117,9 @@ public class StoreServiceImpl implements StoreService{
         if(requestDto.getCloseTime() != null) {
             store.changeCloseTime(requestDto.getCloseTime());
         }
+        if(requestDto.getNotice() != null) {
+            store.changeNotice(requestDto.getNotice());
+        }
         Store newStore = storeRepository.save(store);
         log.info("::: 가게 수정 완료 :::");
         return new StoreResponseDto(newStore);
@@ -122,25 +128,29 @@ public class StoreServiceImpl implements StoreService{
     // 가게 폐업
     @Transactional
     @Override
-    public void delete(Long storeId) {
+    public void delete(Long storeId, AuthUser authUser) {
         log.info("::: 가게 폐업 로직 동작 :::");
         Store store = storeRepository.checkStore(storeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
+                .orElseThrow(() -> new InvalidRequestException("해당 가게가 없습니다!"));
         // 권한 체크 코드
-//        if(!store.getUser().getUserId().equals(ArgumentResolver에서 반환된 userId값)) {
-//            throw new IllegalArgumentException("폐업 권한이 없습니다!");
-//        }
+        if(!store.getUser().getId().equals(authUser.getId())) {
+            throw new AccessDeniedException("폐업 권한이 없습니다!");
+        }
+        store.getMenuList().forEach(Menu::deleteMenu);
         store.deleteStore();
         log.info("::: 가게 폐업 완 :::");
     }
 
     @Transactional
     @Override
-    public void checkAdvertise(Long storeId) {
+    public void checkAdvertise(Long storeId, AuthUser authUser) {
         log.info("::: 가게 광고 선정 로직 동작 :::");
         Store store = storeRepository.checkStore(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
-        // 해당 가게의 주인인지 확인하는 로직 필요 추후 추가
+        // 권한 체크 코드
+        if(!store.getUser().getId().equals(authUser.getId())) {
+            throw new AccessDeniedException("해당 가게 주인이 아닙니다!");
+        }
         if(store.getAdvertise().equals(true)) {
             throw new IllegalArgumentException("해당 가게는 이미 광고로 지정되었습니다.");
         }
@@ -150,11 +160,14 @@ public class StoreServiceImpl implements StoreService{
 
     @Transactional
     @Override
-    public void unCheckAdvertise(Long storeId) {
+    public void unCheckAdvertise(Long storeId ,AuthUser authUser) {
         log.info("::: 가게 광고 해제 로직 동작 :::");
         Store store = storeRepository.checkStore(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
-        // 해당 가게의 주인인지 확인하는 로직 필요 추후 추가
+        // 권한 체크 코드
+        if(!store.getUser().getId().equals(authUser.getId())) {
+            throw new AccessDeniedException("해당 가게 주인이 아닙니다!");
+        }
         if(store.getAdvertise().equals(false)) {
             throw new IllegalArgumentException("해당 가게는 광고 선정 상태가 아닙니다.");
         }

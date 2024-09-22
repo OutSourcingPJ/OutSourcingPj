@@ -15,6 +15,7 @@ public class GetStoreResponseDto {
     private Double orderAmount;
     private LocalTime openTime;
     private LocalTime closeTime;
+    private String notice;
     private List<MenuResponseDto> menuList;
 
     public GetStoreResponseDto(Store store) {
@@ -22,6 +23,7 @@ public class GetStoreResponseDto {
         this.orderAmount = store.getOrderAmount();
         this.openTime = store.getOpenTime();
         this.closeTime = store.getCloseTime();
+        this.notice = store.getNotice();
         this.menuList = store.getMenuList().stream()
                 .map(menu -> new MenuResponseDto(menu.getMenuName(), menu.getMenuPrice()))
                 .collect(Collectors.toList());
