@@ -30,7 +30,7 @@
     <content url="file://$MODULE_DIR$/../../OutSouringProject/src/test">
       <sourceFolder url="file://$MODULE_DIR$/../../OutSouringProject/src/test/java" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="corretto-17" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="17" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="OutSouringProject.main" />
     <orderEntry type="library" name="Gradle: at.favre.lib:bcrypt:0.10.2" level="project" />
