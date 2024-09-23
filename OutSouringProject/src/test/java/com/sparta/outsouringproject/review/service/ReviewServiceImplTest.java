@@ -53,8 +53,7 @@ class ReviewServiceImplTest {
     @Test
     void 리뷰등록_성공() throws IOException {
         // given
-        Long menuId = 1L;
-        Menu menu = new Menu("name", menuId, 12000L);
+        Menu menu = new Menu("name", 12000L);
         Long userId = 1L;
         User user = new User("1Q2w3e4r@", "피곤하구나", "qweasd@asdasd.com", Role.USER, false);
         ReflectionTestUtils.setField(user, "id", userId);
