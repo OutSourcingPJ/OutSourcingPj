@@ -1,6 +1,5 @@
 package com.sparta.outsouringproject.order.entity;
 
-import com.sparta.outsouringproject.cart.dto.CartItemInfo;
 import com.sparta.outsouringproject.menu.entity.Menu;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,15 +17,17 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="order_id")
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="menu_id")
+    @JoinColumn(name = "menu_id")
     private Menu menu;
 
     private Long quantity;

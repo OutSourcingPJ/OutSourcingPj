@@ -5,7 +5,6 @@ import com.sparta.outsouringproject.cart.repository.CartItemRepository;
 import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.common.enums.OrderStatus;
 import com.sparta.outsouringproject.common.exceptions.AccessDeniedException;
-import com.sparta.outsouringproject.common.exceptions.AuthException;
 import com.sparta.outsouringproject.common.exceptions.InvalidRequestException;
 import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.menu.repository.MenuRepository;
@@ -32,6 +31,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
             .orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
 
         LocalTime now = LocalDateTime.now().toLocalTime();
-        if(now.isBefore(store.getOpenTime()) && now.isAfter(store.getCloseTime())) {
+        if (!(now.isAfter(store.getOpenTime()) && now.isBefore(store.getCloseTime()))) {
             throw new InvalidRequestException("주문 가능 시간이 아닙니다.");
         }
 
@@ -67,18 +67,18 @@ public class OrderServiceImpl implements OrderService {
 
         long userCartId = user.getCart().getId();
 
-        for(CartItem cartItem : cartItems) {
-            if(cartItem.getCart().getId() != userCartId) {
+        for (CartItem cartItem : cartItems) {
+            if (cartItem.getCart().getId() != userCartId) {
                 throw new AccessDeniedException("요청한 장바구니는 현재 유저의 장바구니가 아닙니다.");
             }
             totalPrice += cartItem.getPrice();
         }
 
-        if(totalPrice < 0) {
-            throw new InvalidRequestException("총 금액은 0보다 커야합니다.");
+        if (totalPrice < 0) {
+            throw new InvalidRequestException("총 금액은 0보다 크거나 같아야 합니다.");
         }
 
-        if(store.getOrderAmount() < totalPrice){
+        if (store.getOrderAmount() > totalPrice) {
             throw new InvalidRequestException("주문 금액이 최소 주문 금액보다 낮습니다.");
         }
 
@@ -91,7 +91,7 @@ public class OrderServiceImpl implements OrderService {
         for (CartItem cartItemInfo : cartItems) {
             Long menuId = cartItemInfo.getMenu().getMenu_id();
             Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
+                .orElseThrow(() -> new InvalidRequestException("존재하지 않는 메뉴입니다."));
 
             OrderItem orderItem = new OrderItem(order, menu, cartItemInfo.getQuantity(),
                 cartItemInfo.getPrice(), cartItemInfo.getTotalPrice());
@@ -121,15 +121,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void changeOrderStatus(AuthUser auth, Long storeId, Long orderId,
         OrderStatusChangeRequestDto requestDto) {
-        Store store = storeRepository.findById(storeId).orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
+        Store store = storeRepository.findById(storeId)
+            .orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
 
         User user = userRepository.findByIdOrElseThrow(auth.getId());
 
-        if(store.getUser() == null){
+        if (store.getUser() == null) {
             throw new InvalidRequestException("가게의 사장 정보가 없습니다.");
         }
 
-        if(!user.equals(store.getUser())){
+        if (!user.equals(store.getUser())) {
             throw new AccessDeniedException("가게의 주인이 아닙니다.");
         }
 
@@ -138,13 +139,13 @@ public class OrderServiceImpl implements OrderService {
         order.updateStatus(requestDto.getOrderStatus());
         orderStatusTracker.onOrderStatusChanged(order.getId(), order.getStatus());
 
-
         // 주문이 완료되면 기록 저장
-        if(order.getStatus().equals(OrderStatus.COMPLETED)) {
-            List<OrderItem> items = orderItemRepository.findAllByOrder(order);
+        if (order.getStatus()
+            .equals(OrderStatus.COMPLETED)) {
+            List<OrderItem> items = orderRepository.findAllOrderItemsByOrder(order);
             List<OrderHistory> historyList = new ArrayList<>();
 
-            for(OrderItem item : items){
+            for (OrderItem item : items) {
                 OrderHistory history = OrderHistory.builder()
                     .soldDate(LocalDateTime.now())
                     .orderId(item.getOrder().getId())
@@ -160,14 +161,11 @@ public class OrderServiceImpl implements OrderService {
                 historyList.add(history);
             }
 
-            if(!historyList.isEmpty()){
-                orderHistoryRepository.saveAll(historyList);
-            }
+            orderHistoryRepository.saveAll(historyList);
             orderItemRepository.deleteAll(items);
             orderRepository.delete(order);
         }
     }
-
 
 
     @Override
@@ -175,11 +173,11 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByIdOrElseThrow(orderId);
         User user = userRepository.findByIdOrElseThrow(auth.getId());
 
-        if(auth.getRole() == Role.OWNER && !user.equals(order.getStore().getUser())) {
+        if (auth.getRole() == Role.OWNER && !user.equals(order.getStore().getUser())) {
             throw new AccessDeniedException("해당 가게의 사장이 아닙니다.");
         }
 
-        if(auth.getRole() == Role.USER && !user.equals(order.getUser())) {
+        if (auth.getRole() == Role.USER && !user.equals(order.getUser())) {
             throw new AccessDeniedException("주문자가 아닙니다.");
         }
 
@@ -189,15 +187,22 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderItemInfo> getAllOrdersByStoreId(AuthUser auth, Long storeId) {
 
-        Store store = storeRepository.findStoreWithOrdersById(storeId)
+        Store store = storeRepository.findStoreWithOrdersAndUserById(storeId)
             .orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
 
         User user = userRepository.findByIdOrElseThrow(auth.getId());
-        if(auth.getRole() == Role.OWNER && store.getUser() != user) {
+
+        if (auth.getRole() == Role.USER) {
+            throw new AccessDeniedException("해당 가게의 사장님만 조회할 수 있습니다.");
+        }
+
+        if (!ObjectUtils.nullSafeEquals(store.getUser(), user)) {
             throw new AccessDeniedException("해당 가게의 사장이 아닙니다.");
         }
 
-        List<OrderItem> allByOrderIn = orderItemRepository.findAllByOrderIn(store.getOrders());
-        return allByOrderIn.stream().map(OrderItemInfo::new).toList();
+        List<OrderItem> allByOrderIn = orderRepository.findAllOrderItemByStore(store);
+        return allByOrderIn.stream()
+            .map(OrderItemInfo::new)
+            .toList();
     }
 }

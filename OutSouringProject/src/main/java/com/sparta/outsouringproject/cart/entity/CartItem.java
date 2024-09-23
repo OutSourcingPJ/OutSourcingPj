@@ -51,7 +51,7 @@
             this.totalPrice = price * quantity;
 
             if(totalPrice < 0) {
-                throw new InvalidRequestException("총 금액은 0보다 커야합니다.");
+                throw new InvalidRequestException("총 금액은 0보다 크거나 같아야 합니다.");
             }
         }
     }

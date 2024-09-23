@@ -7,5 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class OrderStatusResponseDto {
+
     private OrderStatus orderStatus;
 }
