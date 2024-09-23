@@ -19,9 +19,9 @@ public class Menu {
     private Long menu_id;
 
 
-      @ManyToOne(fetch = FetchType.LAZY)
-      @JoinColumn(name = "store_id",nullable = false)
-      private Store store;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id",nullable = false)
+    private Store store;
 
 
     @Column(nullable = false, length = 50)
@@ -34,9 +34,8 @@ public class Menu {
     private Boolean deleted = false;
 
 
-    public Menu(String menuName, Long menu_id, Long menuPrice) {
+    public Menu(String menuName, Long menuPrice) {
         this.menuName = menuName;
-        this.menu_id = menu_id;
         this.menuPrice = menuPrice;
     }
 

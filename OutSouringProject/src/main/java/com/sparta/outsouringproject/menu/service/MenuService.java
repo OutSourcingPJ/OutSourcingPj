@@ -4,7 +4,6 @@ import com.sparta.outsouringproject.menu.dto.MenuRequestDto;
 import com.sparta.outsouringproject.menu.dto.MenuResponseDto;
 import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.menu.repository.MenuRepository;
-import com.sparta.outsouringproject.store.dto.CreateStoreRequestDto;
 import com.sparta.outsouringproject.store.entity.Store;
 import com.sparta.outsouringproject.store.repository.StoreRepository;
 import jakarta.security.auth.message.AuthException;
@@ -36,7 +35,7 @@ public class MenuService {
         }
 
         // 새로운 메뉴 생성
-        Menu menu = new Menu(requestDto.getMenuName(), null, Long.parseLong(requestDto.getMenuPrice()));
+        Menu menu = new Menu(requestDto.getMenuName(), Long.parseLong(requestDto.getMenuPrice()));
         menuRepository.save(menu);
 
         return new MenuResponseDto(menu.getMenuName(), menu.getMenuPrice());
@@ -57,9 +56,9 @@ public class MenuService {
                 .collect(Collectors.toList());
     }
 
-    private Store validateOwner(String token, Store storeId) throws AuthException {
+    private Store validateOwner(String token, Long storeId) throws AuthException {
         // 토큰을 통해 사장님 정보를 가져오고, 사장님이 본인의 가게를 등록하려는지 확인하는 로직 필요
-        Store store = storeRepository.findById(storeId.getStoreId())
+        Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게입니다."));
 
         // 사장님 확인 로직 예시
@@ -73,15 +72,15 @@ public class MenuService {
     @Transactional
     public void deleteMenu(String token, Long menuId) throws AuthException {
         // 메뉴가 존재하는지 확인
-        Menu menu = menuRepository.findById(menuId)
+        Menu menus = menuRepository.findById(menuId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
 
         // 해당 메뉴가 속한 가게의 사장님인지 확인
-        Store store = validateOwner(token, menu.getStore());
+        Store store = validateOwner(token, menus.getStore().getStoreId() );
 
         //메뉴 삭제 상태로 변경
-        menu.deleteMenu();
-        log.info("메뉴 '{}' 가 삭제되었습니다.", menu.getMenuName());
+        menus.deleteMenu();
+        log.info("메뉴 '{}' 가 삭제되었습니다.", menus.getMenuName());
     }
 
 }

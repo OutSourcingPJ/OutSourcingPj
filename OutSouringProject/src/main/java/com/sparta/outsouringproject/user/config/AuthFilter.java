@@ -30,9 +30,9 @@ public class AuthFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String url = httpServletRequest.getRequestURI();
 
-        if(StringUtils.hasText(url) && (url.startsWith("/api/user") || url.startsWith("/tracker") || url.startsWith("/connect")|| url.startsWith("/statistics"))) {
+        if (StringUtils.hasText(url) && (url.startsWith("/api/user") || url.startsWith("/tracker") || url.startsWith("/connect") || url.startsWith("/statistics"))) {
             chain.doFilter(request, response);
-        }else{
+        } else {
             String tokenValue = jwtUtil.getTokenFromRequest(httpServletRequest);
 
             if (StringUtils.hasText(tokenValue)) { // 토큰이 존재하면 검증 시작
@@ -58,7 +58,6 @@ public class AuthFilter implements Filter {
 //                );
 
 
-
                 // request.setAttribute("email", email);
                 chain.doFilter(request, response); // 다음 Filter 로 이동
 
@@ -68,5 +67,7 @@ public class AuthFilter implements Filter {
             }
         }
     }
-
 }
+
+
+
