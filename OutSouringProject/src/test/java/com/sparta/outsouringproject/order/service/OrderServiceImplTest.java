@@ -148,7 +148,7 @@ class OrderServiceImplTest {
             Store store = new Store();
             ReflectionTestUtils.setField(menu, "store", store);
             ReflectionTestUtils.setField(store, "storeId", 1L);
-            CartItem cartItem = new CartItem(1L, 5000L, user2_cart, menu);
+            CartItem cartItem = new CartItem(1L, 2000L, user2_cart, menu);
 
             given(userRepository.findByIdOrElseThrow(anyLong())).willReturn(authUser);
             given(cartItemRepository.findAllByCart_User(any(User.class))).willReturn(List.of(cartItem));
@@ -205,7 +205,7 @@ class OrderServiceImplTest {
             ReflectionTestUtils.setField(menu, "store", store);
             ReflectionTestUtils.setField(store, "storeId", 1L);
             ReflectionTestUtils.setField(store, "orderAmount", 2000d);
-            CartItem cartItem = new CartItem(1L, 1000L, user_cart, menu);
+            CartItem cartItem = new CartItem(1L,1000L,  user_cart, menu);
 
             given(userRepository.findByIdOrElseThrow(anyLong())).willReturn(authUser);
             given(cartItemRepository.findAllByCart_User(any(User.class))).willReturn(List.of(cartItem));
@@ -235,7 +235,7 @@ class OrderServiceImplTest {
             ReflectionTestUtils.setField(menu, "store", store);
             ReflectionTestUtils.setField(store, "storeId", 1L);
             ReflectionTestUtils.setField(store, "orderAmount", 2000d);
-            CartItem cartItem = new CartItem(1L, 3000L, user_cart, menu);
+            CartItem cartItem = new CartItem(1L,2000L, user_cart, menu);
 
             given(userRepository.findByIdOrElseThrow(anyLong())).willReturn(authUser);
             given(cartItemRepository.findAllByCart_User(any(User.class))).willReturn(List.of(cartItem));
@@ -266,7 +266,7 @@ class OrderServiceImplTest {
             ReflectionTestUtils.setField(menu, "store", store);
             ReflectionTestUtils.setField(store, "storeId", 1L);
             ReflectionTestUtils.setField(store, "orderAmount", 2000d);
-            CartItem cartItem = new CartItem(1L, 3000L, user_cart, menu);
+            CartItem cartItem = new CartItem(1L, 2000L, user_cart, menu);
             Order order = new Order(authUser, store, OrderStatus.WAITING);
             ReflectionTestUtils.setField(order, "id", 1L);
 
