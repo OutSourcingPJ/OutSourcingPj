@@ -4,17 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="13e8e129-d905-4e28-9b67-18843208f063" name="Changes" comment="Add. 공지 추가, 메뉴 연관삭제 추가">
+    <list default="true" id="13e8e129-d905-4e28-9b67-18843208f063" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/controller/StoreController.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/controller/StoreController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/dto/CreateStoreRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/dto/CreateStoreRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/dto/GetStoreResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/dto/GetStoreResponseDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/dto/ModifyStoreRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/dto/ModifyStoreRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/dto/StoreResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/dto/StoreResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/entity/Store.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/entity/Store.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/service/StoreService.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/service/StoreService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/service/StoreServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/store/service/StoreServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/user/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/main/java/com/sparta/outsouringproject/user/entity/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OutSouringProject/src/test/java/com/sparta/outsouringproject/store/service/StoreServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/OutSouringProject/src/test/java/com/sparta/outsouringproject/store/service/StoreServiceTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -75,8 +68,8 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="JUnit.StoreServiceTest.saveStore_success">
-    <configuration name="StoreServiceTest.saveStore_success" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.StoreServiceTest.unCheckAdvertise_alreadyUnAdvertised">
+    <configuration name="StoreServiceTest.checkAdvertise_alreadyAdvertised" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="OutSouringProject.test" />
       <extension name="coverage">
         <pattern>
@@ -86,33 +79,90 @@
       </extension>
       <option name="PACKAGE_NAME" value="com.sparta.outsouringproject.store.service" />
       <option name="MAIN_CLASS_NAME" value="com.sparta.outsouringproject.store.service.StoreServiceTest" />
-      <option name="METHOD_NAME" value="saveStore_success" />
+      <option name="METHOD_NAME" value="checkAdvertise_alreadyAdvertised" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="OutSouringProjectApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
-      <envs>
-        <env name="DB_NAME" value="sparta_outsourcing" />
-        <env name="DB_PASSWORD" value="root" />
-      </envs>
-      <module name="OutSouringProject.main" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.sparta.outsouringproject.OutSouringProjectApplication" />
+    <configuration name="StoreServiceTest.unCheckAdvertise_alreadyUnAdvertised" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="OutSouringProject.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sparta.outsouringproject.*" />
+          <option name="PATTERN" value="com.sparta.outsouringproject.store.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <option name="PACKAGE_NAME" value="com.sparta.outsouringproject.store.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sparta.outsouringproject.store.service.StoreServiceTest" />
+      <option name="METHOD_NAME" value="unCheckAdvertise_alreadyUnAdvertised" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="StoreServiceTest.unCheckAdvertise_notFoundStore" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="OutSouringProject.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sparta.outsouringproject.store.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sparta.outsouringproject.store.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sparta.outsouringproject.store.service.StoreServiceTest" />
+      <option name="METHOD_NAME" value="unCheckAdvertise_notFoundStore" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StoreServiceTest.unCheckAdvertise_notOwner" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="OutSouringProject.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sparta.outsouringproject.store.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sparta.outsouringproject.store.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sparta.outsouringproject.store.service.StoreServiceTest" />
+      <option name="METHOD_NAME" value="unCheckAdvertise_notOwner" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StoreServiceTest.unCheckAdvertise_success" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="OutSouringProject.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sparta.outsouringproject.store.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sparta.outsouringproject.store.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sparta.outsouringproject.store.service.StoreServiceTest" />
+      <option name="METHOD_NAME" value="unCheckAdvertise_success" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="JUnit.StoreServiceTest.checkAdvertise_alreadyAdvertised" />
+      <item itemvalue="JUnit.StoreServiceTest.unCheckAdvertise_alreadyUnAdvertised" />
+      <item itemvalue="JUnit.StoreServiceTest.unCheckAdvertise_notFoundStore" />
+      <item itemvalue="JUnit.StoreServiceTest.unCheckAdvertise_notOwner" />
+      <item itemvalue="JUnit.StoreServiceTest.unCheckAdvertise_success" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.StoreServiceTest.saveStore_success" />
-        <item itemvalue="Spring Boot.OutSouringProjectApplication" />
+        <item itemvalue="JUnit.StoreServiceTest.unCheckAdvertise_alreadyUnAdvertised" />
+        <item itemvalue="JUnit.StoreServiceTest.unCheckAdvertise_notOwner" />
+        <item itemvalue="JUnit.StoreServiceTest.unCheckAdvertise_notFoundStore" />
+        <item itemvalue="JUnit.StoreServiceTest.unCheckAdvertise_success" />
+        <item itemvalue="JUnit.StoreServiceTest.checkAdvertise_alreadyAdvertised" />
       </list>
     </recent_temporary>
   </component>
@@ -137,7 +187,9 @@
       <workItem from="1726829333106" duration="4954000" />
       <workItem from="1726835479833" duration="112000" />
       <workItem from="1726898280094" duration="9615000" />
-      <workItem from="1726974961380" duration="8567000" />
+      <workItem from="1726974961380" duration="13887000" />
+      <workItem from="1727049731223" duration="550000" />
+      <workItem from="1727050325975" duration="14899000" />
     </task>
     <task id="LOCAL-00001" summary="add&amp;feat. Auth클래스, 어노테이션 추가, 권한 검사 성공">
       <created>1726904288330</created>
@@ -153,15 +205,34 @@
       <option name="project" value="LOCAL" />
       <updated>1726975015508</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Add. 공지 추가, 메뉴 연관삭제 추가, 가게 서비스 테스트 코드 추가">
+      <created>1726987187693</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1726987187693</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add&amp;feat. Auth클래스, 어노테이션 추가, 권한 검사 성공" />
     <MESSAGE value="pull을 위한 커밋" />
-    <option name="LAST_COMMIT_MESSAGE" value="pull을 위한 커밋" />
+    <MESSAGE value="Add. 공지 추가, 메뉴 연관삭제 추가, 가게 서비스 테스트 코드 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add. 공지 추가, 메뉴 연관삭제 추가, 가게 서비스 테스트 코드 추가" />
   </component>
 </project>

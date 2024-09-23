@@ -8,7 +8,6 @@ import java.time.LocalTime;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 public class ModifyStoreRequestDto {
     private String name;
     private Double orderAmount;

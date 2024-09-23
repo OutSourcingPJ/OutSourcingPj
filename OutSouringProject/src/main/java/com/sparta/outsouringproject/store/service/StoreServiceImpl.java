@@ -146,13 +146,13 @@ public class StoreServiceImpl implements StoreService{
     public void checkAdvertise(Long storeId, AuthUser authUser) {
         log.info("::: 가게 광고 선정 로직 동작 :::");
         Store store = storeRepository.checkStore(storeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
+                .orElseThrow(() -> new InvalidRequestException("해당 가게가 없습니다!"));
         // 권한 체크 코드
         if(!store.getUser().getId().equals(authUser.getId())) {
             throw new AccessDeniedException("해당 가게 주인이 아닙니다!");
         }
         if(store.getAdvertise().equals(true)) {
-            throw new IllegalArgumentException("해당 가게는 이미 광고로 지정되었습니다.");
+            throw new InvalidRequestException("해당 가게는 이미 광고로 지정되었습니다.");
         }
         store.checkAdvertise();
         log.info("::: 가게 광고 선정 로직 완 :::");
@@ -163,13 +163,13 @@ public class StoreServiceImpl implements StoreService{
     public void unCheckAdvertise(Long storeId ,AuthUser authUser) {
         log.info("::: 가게 광고 해제 로직 동작 :::");
         Store store = storeRepository.checkStore(storeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 가게가 없습니다!"));
+                .orElseThrow(() -> new InvalidRequestException("해당 가게가 없습니다!"));
         // 권한 체크 코드
         if(!store.getUser().getId().equals(authUser.getId())) {
             throw new AccessDeniedException("해당 가게 주인이 아닙니다!");
         }
         if(store.getAdvertise().equals(false)) {
-            throw new IllegalArgumentException("해당 가게는 광고 선정 상태가 아닙니다.");
+            throw new InvalidRequestException("해당 가게는 광고 선정 상태가 아닙니다.");
         }
         store.unCheckAdvertise();
         log.info("::: 가게 광고 해제 로직 완 :::");
