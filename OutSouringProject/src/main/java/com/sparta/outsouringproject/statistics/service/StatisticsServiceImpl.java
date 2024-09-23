@@ -1,5 +1,6 @@
 package com.sparta.outsouringproject.statistics.service;
 
+import com.sparta.outsouringproject.common.exceptions.InvalidRequestException;
 import com.sparta.outsouringproject.statistics.dto.StatisticsInfo;
 import com.sparta.outsouringproject.statistics.repository.OrderHistoryRepository;
 import com.sparta.outsouringproject.store.entity.Store;
@@ -92,29 +93,31 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public String getStoreName(Long storeId) {
         Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게입니다."));
+            .orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
         return store.getName();
     }
 
     @Override
     public StatisticsInfo getStatistics(Long storeId, LocalDate startDate, LocalDate endDate) {
         Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게입니다."));
+            .orElseThrow(() -> new InvalidRequestException("존재하지 않는 가게입니다."));
 
-        long totalSalesAmount = orderHistoryRepository.findSalesAmountByStoreId(storeId,
-            startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
-        long totalOrderCount = orderHistoryRepository.findOrderCountByStoreId(storeId,
-            startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        Long totalSalesAmount = orderHistoryRepository.findSalesAmountByStoreId(storeId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        Long totalOrderCount = orderHistoryRepository.findOrderCountByStoreId(storeId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+
+        totalSalesAmount = totalSalesAmount == null ? 0 : totalSalesAmount;
+        totalOrderCount = totalOrderCount == null ? 0 : totalOrderCount;
 
         return new StatisticsInfo(totalSalesAmount, totalOrderCount);
     }
 
     @Override
     public StatisticsInfo getStatistics(LocalDate startDate, LocalDate endDate) {
-        long totalSalesAmount = orderHistoryRepository.findSalesAmount(startDate.atStartOfDay(),
-            endDate.atTime(LocalTime.MAX));
-        long totalOrderCount = orderHistoryRepository.findOrderCount(startDate.atStartOfDay(),
-            endDate.atTime(LocalTime.MAX));
+        Long totalSalesAmount = orderHistoryRepository.findSalesAmount(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        Long totalOrderCount = orderHistoryRepository.findOrderCount(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+
+        totalSalesAmount = totalSalesAmount == null ? 0 : totalSalesAmount;
+        totalOrderCount = totalOrderCount == null ? 0 : totalOrderCount;
 
         return new StatisticsInfo(totalSalesAmount, totalOrderCount);
     }

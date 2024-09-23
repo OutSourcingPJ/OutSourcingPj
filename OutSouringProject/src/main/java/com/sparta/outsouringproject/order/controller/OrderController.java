@@ -3,7 +3,6 @@ package com.sparta.outsouringproject.order.controller;
 import com.sparta.outsouringproject.common.annotation.Auth;
 import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.common.dto.ResponseDto;
-import com.sparta.outsouringproject.order.dto.OrderCreateRequestDto;
 import com.sparta.outsouringproject.order.dto.OrderCreateResponseDto;
 import com.sparta.outsouringproject.order.dto.OrderItemInfo;
 import com.sparta.outsouringproject.order.dto.OrderStatusChangeRequestDto;
@@ -13,8 +12,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,8 +42,10 @@ public class OrderController {
      * 주문 상태 변경
      */
     @PatchMapping("/stores/{storeId}/orders/{orderId}/status")
-    public ResponseEntity<ResponseDto<Void>> acceptOrder(@Auth AuthUser authUser, @PathVariable("storeId") Long storeId,
-        @PathVariable("orderId") Long orderId, @RequestBody OrderStatusChangeRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<Void>> acceptOrder(@Auth AuthUser authUser,
+        @PathVariable("storeId") Long storeId,
+        @PathVariable("orderId") Long orderId,
+        @RequestBody OrderStatusChangeRequestDto requestDto) {
         orderService.changeOrderStatus(authUser, storeId, orderId, requestDto);
         return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, "정상적으로 변경되었습니다."));
     }
@@ -69,7 +68,7 @@ public class OrderController {
     @GetMapping("/stores/{storeId}/orders")
     public ResponseEntity<ResponseDto<List<OrderItemInfo>>> getAllOrders(
         @Auth AuthUser authUser, @PathVariable Long storeId
-    ){
+    ) {
         return ResponseEntity.ok(
             ResponseDto.of(HttpStatus.OK, orderService.getAllOrdersByStoreId(authUser, storeId)));
     }
