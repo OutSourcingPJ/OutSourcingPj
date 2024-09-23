@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,6 +79,6 @@ public class ReviewController {
     @DeleteMapping("ownerComment/{ownerCommentId}")
     ResponseEntity<OwnerReviewResponseDto> deleteOwnerComment(@PathVariable Long ownerCommentId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
-        return ResponseEntity.ok(reviewService.deleteOwnerCommemt(ownerCommentId, email));
+        return ResponseEntity.ok(reviewService.deleteOwnerComment(ownerCommentId, email));
     }
 }

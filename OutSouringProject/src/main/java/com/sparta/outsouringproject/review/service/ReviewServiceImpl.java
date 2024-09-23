@@ -97,7 +97,6 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
 
-
     @Override
     public ReviewResponseDto deleteReview(Long reviewId, String email) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
@@ -106,6 +105,7 @@ public class ReviewServiceImpl implements ReviewService {
         return new ReviewResponseDto(review);
     }
 
+    @Override
     @Transactional
     public OwnerReviewResponseDto createOwnerComment(Long reviewId, OwnerReviewRequestDto reviewRequestDto, String email) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
@@ -118,6 +118,7 @@ public class ReviewServiceImpl implements ReviewService {
         return new OwnerReviewResponseDto(savedReview);
     }
 
+    @Override
     @Transactional
     public OwnerReviewResponseDto updateOwnerComment(Long ownerCommentId, OwnerReviewRequestDto ownerReviewRequestDto, String email) {
         OwnerReview ownerReview = ownerReviewRepository.findById(ownerCommentId).orElseThrow(()-> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
@@ -126,14 +127,15 @@ public class ReviewServiceImpl implements ReviewService {
         return new OwnerReviewResponseDto(ownerReview);
     }
 
-    public OwnerReviewResponseDto deleteOwnerCommemt(Long ownerCommentId, String email) {
+    @Override
+    public OwnerReviewResponseDto deleteOwnerComment(Long ownerCommentId, String email) {
         OwnerReview ownerReview = ownerReviewRepository.findById(ownerCommentId).orElseThrow(()-> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
         userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("게시글을 삭제 할 권한이 없습니다."));
         ownerReviewRepository.delete(ownerReview);
         return new OwnerReviewResponseDto(ownerReview);
     }
 
-    private String saveReviewImage(MultipartFile reviewImage, String email) throws IOException {
+    public String saveReviewImage(MultipartFile reviewImage, String email) throws IOException {
         String userDir = uploadDir + "/" + email;
         Path userPath = Paths.get(userDir);
 

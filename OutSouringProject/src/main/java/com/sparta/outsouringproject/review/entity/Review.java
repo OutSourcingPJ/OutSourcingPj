@@ -12,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "review")
 @NoArgsConstructor
 public class Review extends Timestamped {
