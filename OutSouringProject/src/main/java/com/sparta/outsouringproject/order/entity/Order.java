@@ -18,7 +18,6 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,7 +26,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
 public class Order extends Timestamped {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -35,15 +36,15 @@ public class Order extends Timestamped {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="store_id")
+    @JoinColumn(name = "store_id")
     private Store store;
 
     @OneToMany(mappedBy = "order")
-    private List<OrderItem> items = new ArrayList<>();
+    private final List<OrderItem> items = new ArrayList<>();
 
     public Order(User user, Store store, OrderStatus status) {
         relatedUesr(user);
@@ -57,12 +58,14 @@ public class Order extends Timestamped {
 
     public void relatedUesr(User user) {
         this.user = user;
-        user.getOrders().add(this);
+        user.getOrders()
+            .add(this);
     }
 
     public void relatedStore(Store store) {
         this.store = store;
-        store.getOrders().add(this);
+        store.getOrders()
+            .add(this);
     }
 
 }

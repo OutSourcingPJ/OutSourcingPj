@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItemInfo {
+
     private Long orderId;
     private Long orderItemId;
     private OrderStatus orderStatus;
@@ -17,11 +18,14 @@ public class OrderItemInfo {
     private Long price;
     private Long totalPrice;
 
-    public OrderItemInfo(OrderItem orderItem){
-        this.orderId = orderItem.getOrder().getId();
-        this.orderStatus = orderItem.getOrder().getStatus();
+    public OrderItemInfo(OrderItem orderItem) {
+        this.orderId = orderItem.getOrder()
+            .getId();
+        this.orderStatus = orderItem.getOrder()
+            .getStatus();
         this.orderItemId = orderItem.getId();
-        this.menuId = orderItem.getMenu().getMenu_id();
+        this.menuId = orderItem.getMenu()
+            .getMenu_id();
         this.quantity = orderItem.getQuantity();
         this.price = orderItem.getPrice();
         this.totalPrice = orderItem.getTotalPrice();

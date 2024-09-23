@@ -34,6 +34,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     Long countActiveStoresByUser(@Param("user") User user);
 
     // 가게 id로 가져올 때 orders 페치 조인
-    @Query("SELECT s FROM Store s JOIN FETCH s.orders WHERE s.storeId = :id")
-    Optional<Store> findStoreWithOrdersById(@Param("id") Long id);
+    @Query("SELECT s FROM Store s JOIN FETCH s.orders JOIN FETCH s.user WHERE s.storeId = :id")
+    Optional<Store> findStoreWithOrdersAndUserById(@Param("id") Long id);
 }

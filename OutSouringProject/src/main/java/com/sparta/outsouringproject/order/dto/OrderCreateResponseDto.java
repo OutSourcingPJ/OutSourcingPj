@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class OrderCreateResponseDto {
+
     private Long userId;
     private Long storeId;
     private Long orderId;
