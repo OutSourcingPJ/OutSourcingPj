@@ -12,4 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM Review r LEFT JOIN FETCH r.ownerReview WHERE r.menu.menu_id = :menuId")
     Page<Review> findByMenuIdWithOwnerReview(@Param("menuId") Long menuId, Pageable pageable);
+
+
 }

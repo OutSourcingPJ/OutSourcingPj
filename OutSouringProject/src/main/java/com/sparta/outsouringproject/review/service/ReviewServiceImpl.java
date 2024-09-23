@@ -45,7 +45,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewResponseDto createReview(Long menuId, ReviewRequestDto reviewRequestDto, String email, MultipartFile reviewImage) throws IOException {
+    public ReviewResponseDto createReview(Long menuId, ReviewRequestDto reviewRequestDto,
+                                          String email, MultipartFile reviewImage) throws IOException {
 
         //게시물 생성
         Menu menu = menuRepository.findById(menuId).orElseThrow(()-> new IllegalArgumentException("메뉴를 찾을 수 없습니다."));
@@ -62,6 +63,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .user(user)
                 .contents(reviewRequestDto)
                 .image(imagePath)
+                .rating(reviewRequestDto.getRating())
                 .build();
 
         savedReview = reviewRepository.save(savedReview);
@@ -116,6 +118,21 @@ public class ReviewServiceImpl implements ReviewService {
         return new OwnerReviewResponseDto(savedReview);
     }
 
+    @Transactional
+    public OwnerReviewResponseDto updateOwnerComment(Long ownerCommentId, OwnerReviewRequestDto ownerReviewRequestDto, String email) {
+        OwnerReview ownerReview = ownerReviewRepository.findById(ownerCommentId).orElseThrow(()-> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("게시글을 수정 할 권한이 없습니다."));
+        ownerReview.update(user, ownerReviewRequestDto);
+        return new OwnerReviewResponseDto(ownerReview);
+    }
+
+    public OwnerReviewResponseDto deleteOwnerCommemt(Long ownerCommentId, String email) {
+        OwnerReview ownerReview = ownerReviewRepository.findById(ownerCommentId).orElseThrow(()-> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+        userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("게시글을 삭제 할 권한이 없습니다."));
+        ownerReviewRepository.delete(ownerReview);
+        return new OwnerReviewResponseDto(ownerReview);
+    }
+
     private String saveReviewImage(MultipartFile reviewImage, String email) throws IOException {
         String userDir = uploadDir + "/" + email;
         Path userPath = Paths.get(userDir);
@@ -131,6 +148,8 @@ public class ReviewServiceImpl implements ReviewService {
 
         return targetLocation.toString();
     }
+
+
 
 //    private void deleteExistingReviewImage(Review review) {
 //        String existingReviewImage = review.getImage();

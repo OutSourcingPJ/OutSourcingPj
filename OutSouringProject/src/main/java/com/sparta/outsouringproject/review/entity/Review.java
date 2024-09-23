@@ -21,6 +21,9 @@ public class Review extends Timestamped {
     private String contents;
     private String image;
 
+    @Column(nullable = false)
+    private int rating;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -41,17 +44,19 @@ public class Review extends Timestamped {
     }
 
     @Builder
-    public Review(Menu menu, User user, ReviewRequestDto contents, String image) {
+    public Review(Menu menu, User user, ReviewRequestDto contents, String image, int rating) {
         this.contents = contents.getContents();
         this.image = image;
         this.user = user;
         this.menu = menu;
+        this.rating = rating;
 
     }
 
     public void update(User user, ReviewRequestDto reviewRequestDto) {
     this.contents = reviewRequestDto.getContents();
     this.user = user;
+    this.rating = reviewRequestDto.getRating();
     }
 
     public void update(ReviewRequestDto reviewRequestDto, String newReviewImagePath) {

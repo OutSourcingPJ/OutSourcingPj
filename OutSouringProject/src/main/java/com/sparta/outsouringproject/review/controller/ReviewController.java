@@ -68,4 +68,18 @@ public class ReviewController {
         String email = (String) request.getAttribute("email");
         return ResponseEntity.ok(reviewService.createOwnerComment(reviewId, reviewRequestDto, email));
     }
+
+    @PutMapping("ownerComment/{ownerCommentId}")
+    ResponseEntity<OwnerReviewResponseDto> updateOwnerComment(@PathVariable Long ownerCommentId,
+                                                              @RequestBody OwnerReviewRequestDto ownerReviewRequestDto,
+                                                              HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
+        return ResponseEntity.ok(reviewService.updateOwnerComment(ownerCommentId,ownerReviewRequestDto, email));
+    }
+
+    @DeleteMapping("ownerComment/{ownerCommentId}")
+    ResponseEntity<OwnerReviewResponseDto> deleteOwnerComment(@PathVariable Long ownerCommentId, HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
+        return ResponseEntity.ok(reviewService.deleteOwnerCommemt(ownerCommentId, email));
+    }
 }

@@ -30,4 +30,20 @@ public class OwnerReview {
         this.contents = reviewRequestDto.getContents();
         this.review = review;
     }
+
+    public OwnerReview(OwnerReview ownerReview, User user, OwnerReviewRequestDto ownerReviewRequestDto) {
+        this.id = ownerReview.getId();
+        this.user = user;
+        this.contents = ownerReviewRequestDto.getContents();
+    }
+
+    public OwnerReview(OwnerReview ownerReview, User user) {
+        this.id = ownerReview.getId();
+        this.user = user;
+    }
+
+    public void update(User user, OwnerReviewRequestDto ownerReviewRequestDto) {
+        this.user = user;
+        this.contents = ownerReviewRequestDto.getContents();
+    }
 }
