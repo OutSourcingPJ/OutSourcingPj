@@ -50,8 +50,8 @@ class OrderRepositoryTest {
         Store store = new Store();
         store = storeRepository.save(store);
 
-        Menu menu = new Menu("test_1", null, 5000L);
-        Menu menu2 = new Menu("test_2", null, 5000L);
+        Menu menu = new Menu("test_1",  5000L);
+        Menu menu2 = new Menu("test_2",  5000L);
         menu.relatedStore(store);
         menu2.relatedStore(store);
         menu = menuRepository.save(menu);

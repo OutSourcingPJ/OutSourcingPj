@@ -65,7 +65,7 @@ class CartServiceImplTest {
 
             given(userRepository.findByIdOrElseThrow(anyLong())).willReturn(user);
             given(storeRepository.findById(anyLong())).willReturn(Optional.empty());
-            // when then
+            // when thenoutsourcingpj
 
             assertThatThrownBy(() -> cartService.addMenu(auth, dto))
                 .isInstanceOf(InvalidRequestException.class)

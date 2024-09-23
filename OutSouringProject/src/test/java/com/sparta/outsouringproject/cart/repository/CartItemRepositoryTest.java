@@ -65,7 +65,7 @@ class CartItemRepositoryTest {
         Store store = new Store();
         store = storeRepository.save(store);
 
-        Menu menu = new Menu("name", null, 5000L);
+        Menu menu = new Menu("name",  5000L);
         ReflectionTestUtils.setField(menu, "store", store);
 
         menu = menuRepository.save(menu);
