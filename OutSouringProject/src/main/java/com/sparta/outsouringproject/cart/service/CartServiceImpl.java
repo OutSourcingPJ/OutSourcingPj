@@ -82,6 +82,8 @@ public class CartServiceImpl implements CartService {
 
         CartItem cartItem = new CartItem(1L, menuPrice, cart, menu);
         cartItem = cartItemRepository.save(cartItem);
+        cart.updateTime();
+
         return CartItemInfo.builder()
             .cartId(cart.getId())
             .cartItemId(cartItem.getId())
@@ -110,6 +112,7 @@ public class CartServiceImpl implements CartService {
         String menuName = menu.getMenuName();
 
         cartItem.updateQuantity(requestDto.getQuantity());
+        cart.updateTime();
         return CartItemInfo.builder()
             .cartId(cart.getId())
             .cartItemId(cartItem.getId())
@@ -191,6 +194,7 @@ public class CartServiceImpl implements CartService {
             throw new AccessDeniedException("요청한 장바구니의 소유자가 아닙니다.");
         }
 
+        user.getCart().updateTime();
         cartItemRepository.delete(cartItem);
     }
 
@@ -198,6 +202,7 @@ public class CartServiceImpl implements CartService {
     public void deleteAllItems(AuthUser auth) {
         User user = userRepository.findByIdOrElseThrow(auth.getId());
 
+        user.getCart().updateTime();
         cartItemRepository.deleteAllByCart_User(user);
     }
 }
