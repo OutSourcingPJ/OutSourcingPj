@@ -26,6 +26,7 @@ import com.sparta.outsouringproject.store.repository.StoreRepository;
 import com.sparta.outsouringproject.user.entity.Role;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -171,6 +172,7 @@ class CartServiceImplTest {
             ReflectionTestUtils.setField(cart,"user", user);
             ReflectionTestUtils.setField(cart,"id", 1L);
             ReflectionTestUtils.setField(cart, "cartItems", new ArrayList<>());
+            ReflectionTestUtils.setField(cart, "updatedAt", LocalDateTime.now());
 
             CartItem cartItem1 = new CartItem(1L, 2000L, cart, menu);
             ReflectionTestUtils.setField(cartItem1, "id", 1L);
@@ -233,6 +235,7 @@ class CartServiceImplTest {
             ReflectionTestUtils.setField(cart,"user", user);
             ReflectionTestUtils.setField(cart,"id", 1L);
             ReflectionTestUtils.setField(cart, "cartItems", new ArrayList<>());
+            ReflectionTestUtils.setField(cart, "updatedAt", LocalDateTime.now());
 
             CartItem cartItem1 = new CartItem(1L, 2000L, cart, menu);
             ReflectionTestUtils.setField(cartItem1, "id", 1L);
@@ -560,6 +563,8 @@ class CartServiceImplTest {
             // given
             AuthUser auth = new AuthUser(1L, "email@email.com", Role.USER);
             User user = User.fromAuthUser(auth);
+            Cart cart = new Cart();
+            ReflectionTestUtils.setField(user, "cart", cart);
 
             given(userRepository.findByIdOrElseThrow(any())).willReturn(user);
 
