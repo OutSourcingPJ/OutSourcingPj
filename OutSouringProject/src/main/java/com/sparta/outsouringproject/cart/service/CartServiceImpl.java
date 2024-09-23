@@ -18,6 +18,7 @@ import com.sparta.outsouringproject.store.entity.Store;
 import com.sparta.outsouringproject.store.repository.StoreRepository;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -54,8 +55,17 @@ public class CartServiceImpl implements CartService {
             throw new AccessDeniedException("요청한 장바구니의 소유자가 아닙니다.");
         }
 
+
         // 장바구니에 물품이 있을 때
         if(!cart.getCartItems().isEmpty()){
+
+            // 장바구니는 마지막 업데이트 시점으로부터 최대 하루만 유지
+            // 물품이 있다면 삭제
+            if(LocalDateTime.now().isAfter(cart.getUpdatedAt().plusDays(1))){
+                cartItemRepository.deleteAllByCart_User(user);
+            }
+
+
             Long storeId = cart.getCartItems()
                 .get(0)
                 .getMenu()
