@@ -44,8 +44,12 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        byte[] bytes = Base64.getDecoder().decode(secretKey);
-        key = Keys.hmacShaKeyFor(bytes);
+        try {
+            byte[] bytes = Base64.getDecoder().decode(secretKey);
+            key = Keys.hmacShaKeyFor(bytes);
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid secret key format: {}", e.getMessage());
+        }
     }
 
     // 토큰 생성
