@@ -53,6 +53,7 @@ public class Store {
         this.notice = requestDto.getNotice();
         this.user = user;
     }
+
     public void changeName(String name) {
         this.name = name;
     }

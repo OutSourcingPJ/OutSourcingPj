@@ -1,6 +1,8 @@
 package com.sparta.outsouringproject.menu.controller;
 
 
+import com.sparta.outsouringproject.common.annotation.Auth;
+import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.menu.dto.MenuRequestDto;
 import com.sparta.outsouringproject.menu.dto.MenuResponseDto;
 import com.sparta.outsouringproject.menu.service.MenuService;
@@ -20,9 +22,9 @@ public class MenuController {
 
     // 메뉴 생성
     @PostMapping
-    public ResponseEntity<MenuResponseDto> createMenu(@RequestHeader("Authorization") String token, @RequestBody MenuRequestDto requestDto) {
+    public ResponseEntity<MenuResponseDto> createMenu(@Auth AuthUser authUser, @RequestBody MenuRequestDto requestDto) {
         try {
-            MenuResponseDto menuResponseDto = menuService.saveMenu(token, requestDto);
+            MenuResponseDto menuResponseDto = menuService.saveMenu(authUser, requestDto);
             return new ResponseEntity<>(menuResponseDto, HttpStatus.CREATED);
         } catch (IllegalArgumentException | AuthException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -31,9 +33,9 @@ public class MenuController {
 
     // 메뉴 삭제
     @DeleteMapping("/{menuId}")
-    public ResponseEntity<Void> deleteMenu(@RequestHeader("Authorization") String token, @PathVariable Long menuId) {
+    public ResponseEntity<Void> deleteMenu(@Auth AuthUser authUser, @PathVariable Long menuId) {
         try {
-            menuService.deleteMenu(token, menuId);
+            menuService.deleteMenu(authUser, menuId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (IllegalArgumentException | AuthException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
