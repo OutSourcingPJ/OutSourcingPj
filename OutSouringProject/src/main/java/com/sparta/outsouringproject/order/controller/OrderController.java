@@ -54,7 +54,7 @@ public class OrderController {
     /**
      * 현재 주문 상태
      */
-    @GetMapping("orders/{orderId}")
+    @GetMapping("/orders/{orderId}/status")
     public ResponseEntity<ResponseDto<OrderStatusResponseDto>> currentOrderStatus(
         @Auth AuthUser authUser,
         @PathVariable("orderId") Long orderId) {
@@ -71,5 +71,14 @@ public class OrderController {
     ) {
         return ResponseEntity.ok(
             ResponseDto.of(HttpStatus.OK, orderService.getAllOrdersByStoreId(authUser, storeId)));
+    }
+
+    /**
+     * 내 주문 리스트
+     */
+    @GetMapping("/orders")
+    public ResponseEntity<ResponseDto<List<OrderItemInfo>>> getAllOrders( @Auth AuthUser authUser ) {
+        return ResponseEntity.ok(
+            ResponseDto.of(HttpStatus.OK, orderService.getAllOrdersByUser(authUser)));
     }
 }
