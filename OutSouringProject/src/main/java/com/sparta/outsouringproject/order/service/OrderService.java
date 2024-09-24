@@ -37,4 +37,6 @@ public interface OrderService {
     OrderStatusResponseDto getCurrentOrderStatus(AuthUser auth, Long orderId);
 
     List<OrderItemInfo> getAllOrdersByStoreId(AuthUser authUser, Long storeId);
+
+    List<OrderItemInfo> getAllOrdersByUser(AuthUser authUser);
 }

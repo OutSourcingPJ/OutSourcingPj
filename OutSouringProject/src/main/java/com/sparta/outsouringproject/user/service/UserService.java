@@ -47,6 +47,7 @@ public class UserService {
 
         // 카트도 함께 생성
         Cart cart = new Cart(user);
+        cart.updateTime();
         cartRepository.save(cart);
     }
 

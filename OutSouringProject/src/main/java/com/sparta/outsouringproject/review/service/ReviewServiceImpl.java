@@ -101,8 +101,9 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewResponseDto deleteReview(Long reviewId, String email) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
         User user = userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("삭제 권한이 없습니다."));
+        ReviewResponseDto reviewResponseDto = new ReviewResponseDto(review);
         reviewRepository.delete(review);
-        return new ReviewResponseDto(review);
+        return reviewResponseDto;
     }
 
     @Override

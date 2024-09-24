@@ -71,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
             if (cartItem.getCart().getId() != userCartId) {
                 throw new AccessDeniedException("요청한 장바구니는 현재 유저의 장바구니가 아닙니다.");
             }
-            totalPrice += cartItem.getPrice();
+            totalPrice += cartItem.getTotalPrice();
         }
 
         if (totalPrice < 0) {
@@ -203,6 +203,14 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> allByOrderIn = orderRepository.findAllOrderItemByStore(store);
         return allByOrderIn.stream()
             .map(OrderItemInfo::new)
+            .toList();
+    }
+
+    @Override
+    public List<OrderItemInfo> getAllOrdersByUser(AuthUser authUser) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getId());
+        return  orderRepository.findAllOrderItemByUser(user).
+            stream().map(OrderItemInfo::new)
             .toList();
     }
 }

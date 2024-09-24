@@ -30,7 +30,8 @@ public class AuthFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String url = httpServletRequest.getRequestURI();
 
-        if (StringUtils.hasText(url) && (url.startsWith("/api/user") || url.startsWith("/tracker") || url.startsWith("/connect") || url.startsWith("/statistics"))) {
+        if (StringUtils.hasText(url) && (url.startsWith("/api/user") || url.startsWith("/tracker") || url.startsWith("/connect") ||
+            url.startsWith("/statistics") || url.startsWith("/api/statistics"))) {
             chain.doFilter(request, response);
         } else {
             String tokenValue = jwtUtil.getTokenFromRequest(httpServletRequest);

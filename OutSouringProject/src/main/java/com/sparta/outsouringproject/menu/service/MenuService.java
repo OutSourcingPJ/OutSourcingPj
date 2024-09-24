@@ -29,13 +29,14 @@ public class MenuService {
         // 사장님 확인
         Store store = validateOwner(token, requestDto.getStoreId());
 
-        // 메뉴 이름 중복 확인
-        if (menuRepository.findByName(requestDto.getMenuName()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 메뉴 이름입니다: " + requestDto.getMenuName());
-        }
+//        // 메뉴 이름 중복 확인
+//        if (menuRepository.findByName(requestDto.getMenuName()).isPresent()) {
+//            throw new IllegalArgumentException("이미 존재하는 메뉴 이름입니다: " + requestDto.getMenuName());
+//        }
 
         // 새로운 메뉴 생성
         Menu menu = new Menu(requestDto.getMenuName(), Long.parseLong(requestDto.getMenuPrice()));
+        menu.relatedStore(store);
         menuRepository.save(menu);
 
         return new MenuResponseDto(menu.getMenuName(), menu.getMenuPrice());
@@ -62,9 +63,9 @@ public class MenuService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게입니다."));
 
         // 사장님 확인 로직 예시
-        if (!store.getStoreId().equals(token)) {
-            throw new AuthException("권한이 없습니다.");
-        }
+//        if (!store.getStoreId().equals(token)) {
+//            throw new AuthException("권한이 없습니다.");
+//        }
         return store;
     }
 

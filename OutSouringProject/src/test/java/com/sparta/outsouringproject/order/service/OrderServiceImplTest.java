@@ -409,10 +409,26 @@ class OrderServiceImplTest {
     class 주문_조회 {
 
         @Test
+        public void 내_주문_조회_성공() throws Exception {
+            // given
+            AuthUser authUser = new AuthUser(1L, "aaa@mail.com", Role.OWNER);
+
+            Store store = new Store();
+            ReflectionTestUtils.setField(store, "user", User.fromAuthUser(authUser));
+
+            given(userRepository.findByIdOrElseThrow(anyLong())).willReturn(User.fromAuthUser(authUser));
+
+            // when
+            List<OrderItemInfo> res = orderService.getAllOrdersByUser(authUser);
+
+            // then
+            assertThat(res).isEmpty();
+        }
+
+        @Test
         public void 주문_조회_성공() throws Exception {
             // given
             AuthUser authUser = new AuthUser(1L, "aaa@mail.com", Role.OWNER);
-            CreateStoreRequestDto requestDto = new CreateStoreRequestDto();
 
             Store store = new Store();
             ReflectionTestUtils.setField(store, "user", User.fromAuthUser(authUser));
