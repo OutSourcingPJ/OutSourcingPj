@@ -169,6 +169,7 @@
   // 서버의 SSE 이벤트 수신 및 상태 업데이트
   function trackOrder() {
     const orderId = document.getElementById("orderId").value;
+    updateProgressBar(0);
     if (eventSource) {
       eventSource.close(); // 기존 이벤트 소스 종료
     }
@@ -189,6 +190,7 @@
 
       if (status === "COMPLETED") {
         // 배달 완료 시 모달창 표시
+        updateProgressBar(0);
         $('#completedModal').modal('show');
         eventSource.close(); // 주문이 완료되면 SSE 연결 종료
       }

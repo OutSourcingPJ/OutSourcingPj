@@ -43,6 +43,6 @@ public class Cart {
     }
 
     public void updateTime(){
-        updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 }
