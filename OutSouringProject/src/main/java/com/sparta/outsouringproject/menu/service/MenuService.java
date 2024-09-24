@@ -86,7 +86,7 @@ public class MenuService {
 
         // 해당 메뉴가 속한 가게의 사장님인지 확인
         Store store = validateOwner(auth, menus.getStore().getStoreId() );
-
+        menus.relatedStore(store);
         //메뉴 삭제 상태로 변경
         menus.deleteMenu();
         log.info("메뉴 '{}' 가 삭제되었습니다.", menus.getMenuName());
