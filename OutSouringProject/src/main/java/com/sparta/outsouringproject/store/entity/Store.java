@@ -52,6 +52,7 @@ public class Store {
         this.advertise = false;
         this.user = user;
     }
+
     public void changeName(String name) {
         this.name = name;
     }

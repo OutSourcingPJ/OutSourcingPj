@@ -1,5 +1,6 @@
 package com.sparta.outsouringproject.menu.service;
 
+import com.sparta.outsouringproject.common.dto.AuthUser;
 import com.sparta.outsouringproject.menu.dto.MenuRequestDto;
 import com.sparta.outsouringproject.menu.dto.MenuResponseDto;
 import com.sparta.outsouringproject.menu.entity.Menu;
@@ -24,18 +25,21 @@ public class MenuService {
     private final StoreRepository storeRepository;
     public final MenuRepository menuRepository;
 
+
+
+
     @Transactional
-    public MenuResponseDto saveMenu(String token, MenuRequestDto requestDto) throws AuthException {
+    public MenuResponseDto saveMenu(AuthUser auth, MenuRequestDto requestDto) throws AuthException {
         // 사장님 확인
-        Store store = validateOwner(token, requestDto.getStoreId());
+        Store store = validateOwner(auth, requestDto.getStoreId());
 
         // 메뉴 이름 중복 확인
-        if (menuRepository.findByName(requestDto.getMenuName()).isPresent()) {
+        if (menuRepository.findByMenuName(requestDto.getMenuName()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 메뉴 이름입니다: " + requestDto.getMenuName());
         }
 
-        // 새로운 메뉴 생성
-        Menu menu = new Menu(requestDto.getMenuName(), Long.parseLong(requestDto.getMenuPrice()));
+        Menu menu = new Menu(requestDto.getMenuName(),Long.parseLong(requestDto.getMenuPrice()));
+        menu.relatedStore(store);
         menuRepository.save(menu);
 
         return new MenuResponseDto(menu.getMenuName(), menu.getMenuPrice());
@@ -56,13 +60,13 @@ public class MenuService {
                 .collect(Collectors.toList());
     }
 
-    private Store validateOwner(String token, Long storeId) throws AuthException {
+    private Store validateOwner(AuthUser auth, Long storeId) throws AuthException {
         // 토큰을 통해 사장님 정보를 가져오고, 사장님이 본인의 가게를 등록하려는지 확인하는 로직 필요
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게입니다."));
 
         // 사장님 확인 로직 예시
-        if (!store.getStoreId().equals(token)) {
+        if (!store.getUser().getRole().equals(auth.getRole())) {
             throw new AuthException("권한이 없습니다.");
         }
         return store;
@@ -70,13 +74,13 @@ public class MenuService {
 
     // 메뉴 삭제 메서드
     @Transactional
-    public void deleteMenu(String token, Long menuId) throws AuthException {
+    public void deleteMenu(AuthUser auth, Long menuId) throws AuthException {
         // 메뉴가 존재하는지 확인
         Menu menus = menuRepository.findById(menuId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
 
         // 해당 메뉴가 속한 가게의 사장님인지 확인
-        Store store = validateOwner(token, menus.getStore().getStoreId() );
+        Store store = validateOwner(auth, menus.getStore().getStoreId() );
 
         //메뉴 삭제 상태로 변경
         menus.deleteMenu();
