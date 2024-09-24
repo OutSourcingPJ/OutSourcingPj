@@ -90,6 +90,7 @@ public class StatisticsController {
     @ResponseBody
     private ResponseEntity<ResponseDto<StatisticsInfo>> getStatistic(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
+        StatisticsInfo statistics = statisticsService.getStatistics(startDate, endDate);
         return ResponseEntity.ok(ResponseDto.of(HttpStatus.OK, statisticsService.getStatistics(startDate, endDate)));
     }
 }

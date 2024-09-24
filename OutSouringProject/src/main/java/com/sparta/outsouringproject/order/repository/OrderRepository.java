@@ -4,6 +4,7 @@ import com.sparta.outsouringproject.common.exceptions.InvalidRequestException;
 import com.sparta.outsouringproject.order.entity.Order;
 import com.sparta.outsouringproject.order.entity.OrderItem;
 import com.sparta.outsouringproject.store.entity.Store;
+import com.sparta.outsouringproject.user.entity.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,4 +26,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         "JOIN FETCH oi.menu m " +
         "WHERE oi.order = :order")
     List<OrderItem> findAllOrderItemsByOrder(@Param("order") Order order);
+
+    @Query("SELECT oi FROM OrderItem oi " +
+        "JOIN FETCH oi.order o " +
+        "JOIN FETCH o.store s " +
+        "JOIN FETCH o.user u " +
+        "JOIN FETCH oi.menu m " +
+        "WHERE o.user = :user")
+    List<OrderItem> findAllOrderItemByUser(@Param("user") User user);
 }

@@ -50,8 +50,10 @@ public class Store {
         this.closeTime = requestDto.getCloseTime();
         this.storeStatus = false;
         this.advertise = false;
+        this.notice = requestDto.getNotice();
         this.user = user;
     }
+
     public void changeName(String name) {
         this.name = name;
     }

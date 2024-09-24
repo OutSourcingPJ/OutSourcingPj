@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StoreController {
     private final StoreService storeService;
-    private MenuService menuService;
+    private final MenuService menuService;
 
     /**
      * 가게 등록
