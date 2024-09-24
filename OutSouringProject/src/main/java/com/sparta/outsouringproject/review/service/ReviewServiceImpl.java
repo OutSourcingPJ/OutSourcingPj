@@ -14,6 +14,7 @@ import com.sparta.outsouringproject.user.entity.Role;
 import com.sparta.outsouringproject.user.entity.User;
 import com.sparta.outsouringproject.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.sql.exec.ExecutionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

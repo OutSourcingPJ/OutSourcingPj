@@ -5,11 +5,13 @@ import com.sparta.outsouringproject.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "ownerReview")
 @Getter
 @NoArgsConstructor
+@Setter
 
 public class OwnerReview {
     @Id

@@ -3,9 +3,13 @@ package com.sparta.outsouringproject.review.service;
 import com.sparta.outsouringproject.common.exceptions.InvalidRequestException;
 import com.sparta.outsouringproject.menu.entity.Menu;
 import com.sparta.outsouringproject.menu.repository.MenuRepository;
+import com.sparta.outsouringproject.review.dto.request.OwnerReviewRequestDto;
 import com.sparta.outsouringproject.review.dto.request.ReviewRequestDto;
+import com.sparta.outsouringproject.review.dto.response.OwnerReviewResponseDto;
 import com.sparta.outsouringproject.review.dto.response.ReviewResponseDto;
+import com.sparta.outsouringproject.review.entity.OwnerReview;
 import com.sparta.outsouringproject.review.entity.Review;
+import com.sparta.outsouringproject.review.repository.OwnerReviewRepository;
 import com.sparta.outsouringproject.review.repository.ReviewRepository;
 import com.sparta.outsouringproject.user.entity.Role;
 import com.sparta.outsouringproject.user.entity.User;
@@ -47,11 +51,59 @@ class ReviewServiceImplTest {
     @Mock
     private ReviewRepository reviewRepository;
 
+    @Mock
+    private OwnerReviewRepository ownerReviewRepository;
+
     @InjectMocks
     private ReviewServiceImpl reviewServiceIpml;
 
     @Test
     void 리뷰등록_성공() throws IOException {
+        // given
+        Long menuId = 1L;
+        String email = "qweasd@asdasd.com";
+        User user = new User("1Q2w3e4r@", "피곤하구나", email, Role.USER, false);
+        Menu menu = new Menu("name", 12000L);
+
+        MockMultipartFile reviewImage = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test image".getBytes());
+        System.out.println("reviewImage is: " + reviewImage.getOriginalFilename());
+        ReviewRequestDto reviewRequestDto = new ReviewRequestDto();
+        reviewRequestDto.setContents("내용");
+        reviewRequestDto.setRating(4);
+
+        // 메뉴와 유저 조회에 대한 mock 설정
+        given(menuRepository.findById(menuId)).willReturn(Optional.of(menu));
+        given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
+
+        // 이미지 저장에 대한 mock 설정 (이미지 저장 로직이 있는 경우)
+//        String imagePath = "images/review/test.jpg";
+//        given(reviewServiceIpml.saveReviewImage(any(MultipartFile.class), any())).willReturn(imagePath);
+//        System.out.println(imagePath);
+
+        // 리뷰 저장에 대한 mock 설정
+        Review savedReview = Review.builder()
+                .menu(menu)
+                .user(user)
+                .contents(reviewRequestDto)
+                .rating(reviewRequestDto.getRating())
+                .build();
+
+        given(reviewRepository.save(any(Review.class))).willReturn(savedReview);
+
+        // when
+        ReviewResponseDto reviewResponseDto = reviewServiceIpml.createReview(menuId, reviewRequestDto, email, reviewImage);
+
+        // then
+        assertNotNull(reviewResponseDto);
+        assertEquals(reviewRequestDto.getContents(), reviewResponseDto.getContents());
+        assertEquals(reviewRequestDto.getRating(), reviewResponseDto.getRating());
+        assertEquals(savedReview.getImage(), reviewResponseDto.getImage());
+        assertEquals(user.getUsername(), reviewResponseDto.getUsername());
+    }
+
+
+    @Test
+    void 리뷰등록중_회원아이디가_없어_예외처리() throws IOException {
         // given
         Menu menu = new Menu("name", 12000L);
         Long userId = 1L;
@@ -65,24 +117,15 @@ class ReviewServiceImplTest {
         reviewRequestDto.setImages(Arrays.asList(image1, image2));
         reviewRequestDto.setRating(4);
 
-        Review review = new Review();
-        review.setMenu(menu);
-        review.setUser(user);
-        review.setContents(reviewRequestDto.getContents());
-        review.setRating(reviewRequestDto.getRating());
+        // userRepository에서 null을 받았을 때 예외 발생 설정
+        given(menuRepository.findById(isNull())).willThrow(new IllegalArgumentException("회원 아이디가 없습니다."));
+//        given(userRepository.findByEmail(isNull())).willThrow(new IllegalArgumentException("회원 아이디가 없습니다."));
 
-        given(reviewRepository.save(any(Review.class))).willReturn(review);
-
-        // when
-        Review savedReview = reviewRepository.save(review);
-
-        // then
-        assertNotNull(savedReview);
-        assertEquals(reviewRequestDto.getContents(), savedReview.getContents());
-        assertEquals(reviewRequestDto.getRating(), savedReview.getRating());
-        assertEquals(user, savedReview.getUser());
-        assertEquals(menu, savedReview.getMenu());
-
+        // when & then
+        // 예외가 발생하는지 확인
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            reviewServiceIpml.createReview(menu.getMenu_id(), reviewRequestDto, user.getEmail(), image1);
+        });
     }
 
     @Test
@@ -117,22 +160,94 @@ class ReviewServiceImplTest {
     }
 
     @Test
-    void updateReview() {
+    void 리뷰수정_성공() throws IOException {
+        // given
+        Long reviewId = 1L;
+        String email = "qweasd@asdasd.com";
+        User user = new User("1Q2w3e4r@", "피곤하구나", email, Role.USER, false);
+        ReviewRequestDto exRequestDto = new ReviewRequestDto();
+        exRequestDto.setContents("기존 내용");
+        ReviewRequestDto reviewRequestDto = new ReviewRequestDto();
+        reviewRequestDto.setContents("수정된 내용");
+        reviewRequestDto.setRating(5);
+
+        Review existingReview = Review.builder()
+                .user(user)
+                .contents(exRequestDto)
+                .rating(4)
+                .build();
+
+        // 리뷰와 유저 조회에 대한 mock 설정
+        given(reviewRepository.findById(reviewId)).willReturn(Optional.of(existingReview));
+        given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
+
+        // when
+        ReviewResponseDto updatedReviewDto = reviewServiceIpml.updateReview(reviewId, email, reviewRequestDto, null);
+
+        // then
+        assertNotNull(updatedReviewDto);
+        assertEquals(reviewRequestDto.getContents(), updatedReviewDto.getContents());
+        assertEquals(reviewRequestDto.getRating(), updatedReviewDto.getRating());
+        assertEquals(user.getUsername(), updatedReviewDto.getUsername());
     }
 
     @Test
     void deleteReview() {
+        //given
+        Long reviewId = 1L;
+        String email = "qweasd@naver.com";
+        User user = new User("1Q2w3e4r@", "피곤하구나", email, Role.USER, false);
+        ReflectionTestUtils.setField(user, "id", reviewId);
+        ReviewRequestDto reviewRequestDto = new ReviewRequestDto();
+        reviewRequestDto.setContents("삭제될 것이야");
+        Review existingReview = Review.builder()
+                .user(user)
+                .contents(reviewRequestDto)
+                .build();
+        given(reviewRepository.findById(reviewId)).willReturn(Optional.of(existingReview));
+        given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
+
+        //when
+        ReviewResponseDto deleteReviewResponseDto = reviewServiceIpml.deleteReview(reviewId, email);
+
+        //then
+        assertNotNull(deleteReviewResponseDto);
     }
 
     @Test
     void createOwnerComment() {
-    }
+        //given
+        Long reviewId = 1L;
+        Long ownerId = 2L;
+        Long userId = 1L;
+        String ownerEmail = "owner@naver.com";
+        String userEmail = "user@naver.com";
 
-    @Test
-    void updateOwnerComment() {
-    }
+        // 실제 리뷰 작성자 (일반 사용자)
+        User user = new User("1Q2w3e4r@", "user", userEmail, Role.USER, false);
+        ReflectionTestUtils.setField(user, "id", userId);
 
-    @Test
-    void deleteOwnerComment() {
+        // 가게 주인 (OWNER 권한)
+        User ownerUser = new User("1Q2w3e4r@", "owner", ownerEmail, Role.OWNER, false);
+        ReflectionTestUtils.setField(ownerUser, "id", ownerId);
+
+        Review review = new Review();
+        review.setId(reviewId);
+        review.setContents("리뷰 내용");
+        review.setUser(user);
+
+        OwnerReviewRequestDto ownerReviewRequestDto = new OwnerReviewRequestDto();
+        ReflectionTestUtils.setField(ownerReviewRequestDto, "contents", "사장님 댓글");
+
+        // mock 설정: 리뷰와 owner 조회
+        given(reviewRepository.findById(review.getId())).willReturn(Optional.of(review));
+        given(userRepository.findByEmail(ownerUser.getEmail())).willReturn(Optional.of(ownerUser));
+
+        // when
+        OwnerReviewResponseDto ownerReviewResponseDto = reviewServiceIpml.createOwnerComment(review.getId(), ownerReviewRequestDto, ownerUser.getEmail());
+
+        // then
+        assertNotNull(ownerReviewResponseDto);
+        assertEquals(ownerReviewResponseDto.getContents(), "사장님 댓글");
     }
 }
